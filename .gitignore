@@ -11,5 +11,7 @@ tags
 tags.ignore
 
 data/
+debug/
+dev-planning/
 docs/.obsidian
 playground/

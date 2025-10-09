@@ -3,7 +3,13 @@
  * Provides tools for working with BBEdit notebooks and projects
  */
 
-import { AppPlugin, ToolRegistry, WorkflowRegistry } from 'jsr:@beyondbetter/bb-mcp-server';
+import {
+	AppPlugin,
+	ToolRegistration,
+	ToolRegistry,
+	WorkflowBase,
+	WorkflowRegistry,
+} from 'jsr:@beyondbetter/bb-mcp-server';
 import { dirname, fromFileUrl } from '@std/path';
 import { z } from 'zod';
 import { findAndExecuteScript } from '../../utils/scriptLoader.ts';
@@ -14,10 +20,22 @@ const getPluginDir = (): string => {
 	return dirname(fromFileUrl(currentFileUrl));
 };
 
+// Expand ~ to home directory in paths
+const expandHomePath = (path: string): string => {
+	if (path.startsWith('~/')) {
+		const home = Deno.env.get('HOME') || Deno.env.get('USERPROFILE') || '';
+		return path.replace(/^~/, home);
+	}
+	return path;
+};
+
 export default {
 	name: 'bbedit',
 	version: '1.0.0',
 	description: 'Tools for creating and managing BBEdit notebooks and projects',
+
+	workflows: [] as WorkflowBase[],
+	tools: [] as ToolRegistration[],
 
 	async initialize(
 		dependencies: any,
@@ -71,9 +89,10 @@ export default {
 					logger.info(`Creating BBEdit notebook: ${args.name}`);
 
 					// Prepare template variables
+					const defaultLocation = expandHomePath('~/Documents/BBEdit Notebooks/');
 					const variables: Record<string, any> = {
 						name: args.name,
-						location: args.location || 'missing value',
+						location: args.location ? expandHomePath(args.location) : defaultLocation,
 						contentJson: args.content ? JSON.stringify(args.content) : '[]',
 						shouldOpen: args.open !== false, // Default to true
 					};
@@ -93,7 +112,8 @@ export default {
 						try {
 							scriptResult = typeof result.result === 'string' ? JSON.parse(result.result) : result.result;
 						} catch {
-							scriptResult = result.result;
+							// If parsing fails, treat as plain text result
+							scriptResult = { output: result.result };
 						}
 
 						return {
@@ -103,7 +123,9 @@ export default {
 									text: JSON.stringify(
 										{
 											success: true,
-											...scriptResult,
+											...(typeof scriptResult === 'object' && scriptResult !== null
+												? scriptResult
+												: { output: scriptResult }),
 											metadata: result.metadata,
 										},
 										null,
@@ -144,7 +166,7 @@ export default {
 			{
 				title: 'Create BBEdit Project',
 				description:
-					'Create a new BBEdit project with optional files and folders. Projects organize multiple files and folders for easy access.',
+					"Create a new BBEdit project. Projects organize multiple files and folders for easy access. Note: BBEdit's AppleScript API does not support adding items programmatically - files must be added manually after project creation.",
 				category: 'BBEdit',
 				inputSchema: {
 					name: z.string().describe('Name of the project'),
@@ -179,11 +201,12 @@ export default {
 					logger.info(`Creating BBEdit project: ${args.name}`);
 
 					// Prepare template variables
+					const defaultLocation = expandHomePath('~/Documents/BBEdit Projects/');
 					const variables: Record<string, any> = {
 						name: args.name,
-						location: args.location || 'missing value',
+						location: args.location ? expandHomePath(args.location) : defaultLocation,
 						itemsJson: args.items ? JSON.stringify(args.items) : '[]',
-						settingsJson: args.settings ? JSON.stringify(args.settings) : 'missing value',
+						settingsJson: args.settings ?? null, // null becomes 'missing value' in AppleScript
 						shouldOpen: args.open !== false, // Default to true
 					};
 
@@ -198,12 +221,18 @@ export default {
 
 					if (result.success) {
 						// Parse the JSON result from the script
-						let scriptResult;
+						let scriptResult: any;
 						try {
 							scriptResult = typeof result.result === 'string' ? JSON.parse(result.result) : result.result;
 						} catch {
-							scriptResult = result.result;
+							// If parsing fails, treat as plain text result
+							scriptResult = { output: result.result };
 						}
+
+						// Ensure scriptResult is an object to prevent string spreading
+						const resultData = typeof scriptResult === 'object' && scriptResult !== null
+							? scriptResult
+							: { output: scriptResult };
 
 						return {
 							content: [
@@ -212,7 +241,7 @@ export default {
 									text: JSON.stringify(
 										{
 											success: true,
-											...scriptResult,
+											...resultData,
 											metadata: result.metadata,
 										},
 										null,

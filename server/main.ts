@@ -9,10 +9,6 @@ const appServer = await AppServer.create({
     title: 'AppleScript MCP Server',
     description: 'MCP server for executing AppleScript scripts to interact with macOS applications',
   },
-  pluginConfig: {
-    discoveryPaths: ['./src/plugins'],
-    autoLoad: true,
-  },
 });
 
 await appServer.start();

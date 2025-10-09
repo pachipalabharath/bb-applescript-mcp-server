@@ -27,7 +27,7 @@ tell application "BBEdit"
 	set projectPath to saveLocation & projectFileName
 	
 	-- Create the project
-	set newProject to make new project document with properties {name:projectName}
+	set newProject to make new project document initial save location projectPath
 	
 	-- Add items to project if provided
 	set itemsList to ${itemsJson}
@@ -39,27 +39,9 @@ tell application "BBEdit"
 			if itemPath starts with "\"" then set itemPath to text 2 thru -2 of itemPath
 			
 			if itemPath is not "" then
-				try
-					set itemFile to POSIX file itemPath as alias
-					
-					-- Check if it's a folder or file
-					tell application "System Events"
-						if class of (info for itemFile) is folder then
-							-- Add folder to project
-							tell application "BBEdit"
-								add itemFile to newProject
-							end tell
-						else
-							-- Add file to project
-							tell application "BBEdit"
-								add itemFile to newProject
-							end tell
-						end if
-					end tell
-				on error errMsg
-					-- Skip items that can't be added
-					-- Log could be added here in future
-				end try
+				-- Note: BBEdit's AppleScript API does not provide a working 'add' command for projects
+				-- Items cannot be added programmatically and must be added manually after creation
+				-- This parameter is accepted but ignored
 			end if
 		end repeat
 	end if
@@ -70,15 +52,15 @@ tell application "BBEdit"
 	-- For now, we just create the basic project
 	
 	-- Save the project
-	try
-		set saveFile to POSIX file (POSIX path of saveLocation & projectFileName)
-		save newProject to saveFile
-	on error errMsg
-		return "Error: Failed to save project - " & errMsg
-	end try
+	--try
+	--	set saveFile to POSIX file (POSIX path of saveLocation & projectFileName)
+	--	save newProject to saveFile
+	--on error errMsg
+	--	return "Error: Failed to save project - " & errMsg
+	--end try
 	
 	-- Get saved path
-	set savedPath to POSIX path of (file of newProject as alias)
+	--set savedPath to POSIX path of (file of newProject as alias)
 	
 	-- Optionally open the project
 	set shouldOpenProject to ${shouldOpen}
@@ -93,5 +75,6 @@ tell application "BBEdit"
 	end if
 	
 	-- Return success with project info
-	return "{\"success\":true,\"projectName\":\"" & projectName & "\",\"projectPath\":\"" & savedPath & "\"}"
+	--return "{\"success\":true,\"projectName\":\"" & projectName & "\",\"projectPath\":\"" & savedPath & "\"}"
+	return "{\"success\":true,\"projectName\":\"" & projectName & "\"}"
 end tell

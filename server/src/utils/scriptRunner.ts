@@ -3,6 +3,7 @@
  * Supports both compiled scripts (.scpt) and source scripts (.applescript)
  */
 
+import { ensureDir } from 'jsr:@std/fs@^1.0.16';
 import type { Logger } from 'jsr:@beyondbetter/bb-mcp-server';
 import {
 	AppleScriptResult,
@@ -23,6 +24,90 @@ export interface ScriptRunOptions {
 	inline?: boolean;
 	/** Logger instance */
 	logger?: Logger;
+}
+
+export interface DebugConfig {
+	/** Whether debug mode is enabled */
+	enabled: boolean;
+	/** Save all scripts, not just failures */
+	saveAll: boolean;
+	/** Directory for debug files */
+	debugDir: string;
+	/** Number of lines of context to show in errors */
+	contextLines: number;
+}
+
+/**
+ * Get debug configuration from environment variables
+ */
+export function getDebugConfig(): DebugConfig {
+	return {
+		enabled: Deno.env.get('DEBUG_APPLESCRIPT') === 'true',
+		saveAll: Deno.env.get('DEBUG_APPLESCRIPT_SAVE_ALL') === 'true',
+		debugDir: Deno.env.get('DEBUG_APPLESCRIPT_DIR') || './debug/applescript',
+		contextLines: parseInt(Deno.env.get('DEBUG_APPLESCRIPT_CONTEXT') || '5', 10),
+	};
+}
+
+/**
+ * Save script to debug directory with metadata
+ */
+async function saveDebugScript(
+	scriptContent: string,
+	result: AppleScriptResult,
+	config: DebugConfig,
+	logger?: Logger,
+): Promise<string | undefined> {
+	if (!config.enabled) return undefined;
+
+	// Only save if saveAll is true or if there was an error
+	if (!config.saveAll && result.success) return undefined;
+
+	try {
+		// Ensure debug directory exists
+		await ensureDir(config.debugDir);
+
+		// Create filename with timestamp and status
+		const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+		const status = result.success ? 'success' : 'failed';
+		const scriptFile = `${config.debugDir}/${timestamp}_${status}.applescript`;
+		const metaFile = `${config.debugDir}/${timestamp}_${status}.json`;
+
+		// Save script content
+		await Deno.writeTextFile(scriptFile, scriptContent);
+
+		// Save metadata
+		const metadata = {
+			timestamp: new Date().toISOString(),
+			status,
+			result,
+		};
+		await Deno.writeTextFile(metaFile, JSON.stringify(metadata, null, 2));
+
+		logger?.debug(`Saved debug script to ${scriptFile}`);
+		return scriptFile;
+	} catch (error) {
+		logger?.warn('Failed to save debug script:', error);
+		return undefined;
+	}
+}
+
+/**
+ * Extract context lines around an error line
+ */
+function getErrorContext(scriptContent: string, errorLine: number, contextLines: number): string {
+	const lines = scriptContent.split('\n');
+	const startLine = Math.max(0, errorLine - contextLines - 1);
+	const endLine = Math.min(lines.length, errorLine + contextLines);
+
+	const contextLineNumbers: string[] = [];
+	for (let i = startLine; i < endLine; i++) {
+		const lineNum = (i + 1).toString().padStart(4, ' ');
+		const marker = i === errorLine - 1 ? ' >>>' : '    ';
+		contextLineNumbers.push(`${marker} ${lineNum} | ${lines[i]}`);
+	}
+
+	return contextLineNumbers.join('\n');
 }
 
 /**
@@ -192,6 +277,7 @@ export async function compileAndRun(
 ): Promise<AppleScriptResult> {
 	const startTime = performance.now();
 	const validatedTimeout = validateTimeout(timeout);
+	const debugConfig = getDebugConfig();
 
 	try {
 		logger?.debug('Compiling and running AppleScript');
@@ -217,20 +303,46 @@ export async function compileAndRun(
 				const stderrText = new TextDecoder().decode(compileStderr).trim();
 				const executionTime = performance.now() - startTime;
 
+				// Extract error line number if available
+				const lineMatch = stderrText.match(/:([0-9]+):/);  
+				const errorLine = lineMatch ? parseInt(lineMatch[1], 10) : undefined;
+
+				// Build enhanced error message with context
+				let errorMessage = `Compilation failed: ${extractErrorMessage(stderrText)}`;
+				let errorDetails = stderrText;
+
+				// Add line context if we have a line number
+				if (errorLine && debugConfig.contextLines > 0) {
+					const context = getErrorContext(scriptSource, errorLine, debugConfig.contextLines);
+					errorDetails = `${stderrText}\n\nScript context:\n${context}`;
+				}
+
 				logger?.warn('AppleScript compilation failed:', {
 					code: compileCode,
 					stderr: stderrText,
+					line: errorLine,
 				});
 
-				return createErrorResult(
+				const result = createErrorResult(
 					'script_error',
-					`Compilation failed: ${extractErrorMessage(stderrText)}`,
+					errorMessage,
 					executionTime,
 					undefined,
 					validatedTimeout,
 					'ERR_COMPILE',
-					stderrText,
+					errorDetails,
 				);
+
+				// Save debug script
+				const debugFile = await saveDebugScript(scriptSource, result, debugConfig, logger);
+				if (debugFile) {
+					// Add debug file path to error details
+					if (result.error) {
+						result.error.details = `${result.error.details}\n\nDebug script saved to: ${debugFile}`;
+					}
+				}
+
+				return result;
 			}
 
 			// Run the compiled script
@@ -239,6 +351,13 @@ export async function compileAndRun(
 				timeout: validatedTimeout,
 				logger,
 			});
+
+			// Save debug script for successful runs if configured
+			const debugFile = await saveDebugScript(scriptSource, result, debugConfig, logger);
+			if (debugFile && !result.success && result.error) {
+				// Add debug file path to error details for runtime errors
+				result.error.details = `${result.error.details || ''}\n\nDebug script saved to: ${debugFile}`;
+			}
 
 			return result;
 		} finally {
