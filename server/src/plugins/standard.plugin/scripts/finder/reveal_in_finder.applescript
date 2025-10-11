@@ -49,7 +49,8 @@ on run argv
 			try
 				set fileItem to POSIX file filePath as alias
 				reveal fileItem
-				select fileItem
+				-- don't need both reveal and select - opens folder twice. 
+				--select fileItem
 				set end of revealedItems to filePath
 			on error errMsg
 				set end of failedPaths to filePath & " (" & errMsg & ")"

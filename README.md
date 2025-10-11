@@ -16,11 +16,100 @@ A Model Context Protocol (MCP) server that enables LLM clients to interact with 
 
 - **Deno**: Version 2.5.0 or later
 - **macOS**: Required for AppleScript execution
-- **Applications**: BBEdit (optional, for BBEdit plugin)
+- **Applications**: Any macOS application that supports AppleEvents (scriptable applications)
+  - Examples: Finder (built-in), BBEdit, Mail, Safari, etc.
+  - This server includes plugins for Finder and BBEdit by default
+  - You can create plugins for any scriptable application
 
 ## Quick Start
 
-### 1. Installation
+### Option 1: Run Directly from JSR (Recommended)
+
+**No installation required!** Just Deno and a config file.
+
+#### 1. Install Deno (if needed)
+
+```bash
+curl -fsSL https://deno.land/install.sh | sh
+```
+
+#### 2. Configure in Beyond Better
+
+**Global Configuration** (applies to all projects):
+
+1. Open BB Settings
+2. Go to "MCP Servers" tab
+3. Click "Configure Servers"
+4. Add new server with:
+   - **Server ID**: `applescript`
+   - **Display Name**: `AppleScript Tools`
+   - **Transport Type**: `STDIO (Local Process)`
+   - **Command**: `deno`
+   - **Arguments**: 
+     ```
+     run
+     --allow-all
+     --unstable-kv
+     jsr:@beyondbetter/bb-applescript-mcp-server
+     ```
+
+**Project-Level Configuration** (specific project only):
+
+1. Open your project in BB
+2. Go to Project Settings → "MCP Servers"
+3. Enable server for `AppleScript Tools`
+
+#### 3. Start Using
+
+That's it! The server runs directly from JSR with no download or installation needed.
+
+<details>
+<summary><strong>Alternative: Claude Desktop Configuration</strong></summary>
+
+Add to `~/Library/Application Support/Claude/claude_desktop_config.json`:
+
+```json
+{
+	"mcpServers": {
+		"applescript": {
+			"command": "deno",
+			"args": [
+				"run",
+				"--allow-all",
+				"--unstable-kv",
+				"jsr:@beyondbetter/bb-applescript-mcp-server"
+			]
+		}
+	}
+}
+```
+
+Restart Claude Desktop.
+</details>
+
+#### 4. Optional: Configuration
+
+By default, the server runs with safe defaults:
+- Arbitrary script execution: **disabled**
+- All standard plugins: **enabled**
+- Default timeouts: **30s default, 5min max**
+
+To customize, add environment variables in BB's MCP server configuration:
+
+In BB Settings → MCP Servers → Edit Server → Environment Variables:
+
+| Key | Value | Description |
+|-----|-------|-------------|
+| `LOG_LEVEL` | `info` | Set to `debug` for detailed logs |
+| `ENABLE_ARBITRARY_SCRIPTS` | `false` | Set to `true` to enable run_script tool |
+| `PLUGINS_ALLOWED_LIST` | (empty) | Comma-separated list to load specific plugins |
+| `PLUGINS_BLOCKED_LIST` | (empty) | Comma-separated list to block plugins |
+
+### Option 2: Run from Local Repository
+
+For development or customization:
+
+#### 1. Clone and Setup
 
 ```bash
 # Clone the repository
@@ -31,9 +120,9 @@ cd bb-mcp-applescript/server
 cp .env.example .env
 ```
 
-### 2. Configuration
+#### 2. Configure Environment
 
-Edit `.env` to configure the server:
+Edit `.env` to customize:
 
 ```bash
 # Basic Configuration
@@ -52,7 +141,7 @@ APPLESCRIPT_TIMEOUT_DEFAULT=30000   # 30 seconds
 APPLESCRIPT_TIMEOUT_MAX=300000      # 5 minutes
 ```
 
-### 3. Run the Server
+#### 3. Run the Server
 
 ```bash
 # Development mode (with auto-reload)
@@ -62,7 +151,30 @@ deno task dev
 deno task start
 ```
 
-### 4. Configure in Claude Desktop
+#### 4. Configure in Beyond Better
+
+**Global Configuration:**
+
+1. Open BB Settings (or Project Settings)
+2. Go to "MCP Servers" tab
+3. Add new server:
+   - **Server ID**: `applescript`
+   - **Display Name**: `AppleScript Tools (Local Dev)`
+   - **Transport Type**: `STDIO (Local Process)`
+   - **Command**: `deno`
+   - **Arguments**:
+     ```
+     run
+     --allow-all
+     --unstable-kv
+     /absolute/path/to/bb-mcp-applescript/server/main.ts
+     ```
+   - **Environment Variables** (optional):
+     - `LOG_LEVEL`: `debug`
+     - `ENABLE_ARBITRARY_SCRIPTS`: `false`
+
+<details>
+<summary><strong>Alternative: Claude Desktop Configuration</strong></summary>
 
 Add to `~/Library/Application Support/Claude/claude_desktop_config.json`:
 
@@ -83,6 +195,7 @@ Add to `~/Library/Application Support/Claude/claude_desktop_config.json`:
 ```
 
 Restart Claude Desktop.
+</details>
 
 ## Project Structure
 
@@ -313,41 +426,58 @@ PLUGINS_BLOCKED_LIST=experimental
 
 ### Creating Custom Plugins
 
-1. Create a new directory: `src/plugins/myplugin.plugin/`
-2. Add plugin file: `plugin.ts` (or `MyPlugin.ts`, `my.plugin.ts`)
-3. Add scripts directory: `scripts/`
-4. Implement the plugin interface:
+Plugins allow you to add tools for any scriptable macOS application. See the complete guide:
+
+**📝 [Creating Plugins Guide](docs/creating-plugins.md)**
+
+Quick example for a Mail.app plugin:
 
 ```typescript
+// src/plugins/mail.plugin/plugin.ts
 import { AppPlugin, ToolRegistry, z } from 'jsr:@beyondbetter/bb-mcp-server';
+import { findAndExecuteScript } from '../../utils/scriptLoader.ts';
 
 export default {
-	name: 'my-plugin',
+	name: 'mail',
 	version: '1.0.0',
-	description: 'My custom plugin',
+	description: 'Tools for Mail.app',
+	workflows: [],
+	tools: [],
 
 	async initialize(dependencies, toolRegistry, workflowRegistry) {
-		// Register tools here
+		const pluginDir = getPluginDir();
+		
 		toolRegistry.registerTool(
-			'my_tool',
+			'send_email',
 			{
-				title: 'My Tool',
-				description: 'What my tool does',
-				category: 'Custom',
+				title: 'Send Email',
+				description: 'Create an email in Mail.app',
+				category: 'Mail',
 				inputSchema: {
-					param: z.string().describe('Parameter description'),
+					to: z.string().email().describe('Recipient'),
+					subject: z.string().describe('Subject'),
+					body: z.string().describe('Body'),
 				},
 			},
 			async (args) => {
-				// Tool implementation
-				return {
-					content: [{ type: 'text', text: 'Result' }],
-				};
+				// Runs scripts/send_email.applescript with template variables
+				return await findAndExecuteScript(
+					pluginDir,
+					'send_email',
+					{ to: args.to, subject: args.subject, body: args.body }
+				);
 			},
 		);
 	},
 } as AppPlugin;
 ```
+
+The guide covers:
+- Plugin structure and file naming
+- AppleScript template variables
+- Multiple tools per plugin
+- Error handling and debugging
+- Complete working examples
 
 ## Script Development
 

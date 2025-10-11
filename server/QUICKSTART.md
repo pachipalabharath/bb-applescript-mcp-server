@@ -1,46 +1,54 @@
 # Quick Start Guide
 
-## 5-Minute Setup
+## 2-Minute Setup (JSR)
 
-### 1. Prerequisites Check
+**The easiest way!** No download, no installation, no configuration files.
+
+**Works with any macOS application that supports AppleEvents** (scriptable applications like Finder, Mail, Safari, BBEdit, etc.). This server includes plugins for Finder and BBEdit by default.
+
+### 1. Install Deno
 
 ```bash
-# Check Deno version (need 2.5.0+)
+# Check if you have Deno (need 2.5.0+)
 deno --version
 
 # If not installed:
 curl -fsSL https://deno.land/install.sh | sh
 ```
 
-### 2. Environment Setup
+### 2. Configure in Beyond Better
 
-```bash
-cd server
-cp .env.example .env
-```
+**Option A: Global Configuration** (all projects)
 
-Edit `.env` if you want to customize (defaults are fine for testing):
+1. Open **BB Settings**
+2. Navigate to **MCP Servers** tab
+3. Click **Configure Servers**
+4. Add server:
+   - **Server ID**: `applescript`
+   - **Display Name**: `AppleScript Tools`
+   - **Transport**: `STDIO (Local Process)`
+   - **Command**: `deno`
+   - **Arguments** (one per line):
+     ```
+     run
+     --allow-all
+     --unstable-kv
+     jsr:@beyondbetter/bb-applescript-mcp-server
+     ```
+5. Click **Save**
 
-```bash
-# Optional: Enable dangerous run_script tool
-# ENABLE_ARBITRARY_SCRIPTS=true
+**Option B: Project-Level Configuration** (specific project)
 
-# Optional: Adjust timeouts
-# APPLESCRIPT_TIMEOUT_DEFAULT=30000
-# APPLESCRIPT_TIMEOUT_MAX=300000
-```
+1. Open your project in BB
+2. Go to **Project Settings** → **MCP Servers**
+3. Enable server for `AppleScript Tools`
 
-### 3. Run the Server
+That's it! You're done. 🎉
 
-```bash
-# Start server
-deno task start
+The server runs directly from JSR (JavaScript Registry). Nothing is downloaded or installed except what Deno caches automatically.
 
-# Or for development with auto-reload:
-deno task dev
-```
-
-### 4. Configure Claude Desktop
+<details>
+<summary><strong>Alternative: Claude Desktop</strong></summary>
 
 Edit `~/Library/Application Support/Claude/claude_desktop_config.json`:
 
@@ -53,20 +61,21 @@ Edit `~/Library/Application Support/Claude/claude_desktop_config.json`:
 				"run",
 				"--allow-all",
 				"--unstable-kv",
-				"/FULL/PATH/TO/bb-mcp-applescript/server/main.ts"
+				"jsr:@beyondbetter/bb-applescript-mcp-server"
 			]
 		}
 	}
 }
 ```
 
-**Important**: Use the FULL absolute path!
-
 Restart Claude Desktop.
+</details>
 
-### 5. Test It!
+### 3. Start Using
 
-In Claude, try these commands:
+### 4. Test It!
+
+In Beyond Better (or Claude), try these commands:
 
 **Check permissions:**
 ```
@@ -88,6 +97,114 @@ Show me what BBEdit commands are available for projects
 Create a BBEdit notebook called "Test Notebook" with some sample text
 ```
 
+## Optional: Custom Configuration
+
+The JSR version runs with safe defaults, but you can customize using environment variables.
+
+**In Beyond Better:**
+
+1. Edit your server in **MCP Servers** settings
+2. Add **Environment Variables**:
+
+| Key | Value | Purpose |
+|-----|-------|----------|
+| `LOG_LEVEL` | `debug` | Enable detailed logging |
+| `ENABLE_ARBITRARY_SCRIPTS` | `false` | Enable run_script tool (security risk!) |
+| `PLUGINS_ALLOWED_LIST` | `standard-tools,bbedit` | Load only specific plugins |
+| `PLUGINS_BLOCKED_LIST` | `experimental` | Block specific plugins |
+
+<details>
+<summary><strong>For Claude Desktop (JSON config)</strong></summary>
+
+```json
+{
+	"mcpServers": {
+		"applescript": {
+			"command": "deno",
+			"args": [
+				"run",
+				"--allow-all",
+				"--unstable-kv",
+				"jsr:@beyondbetter/bb-applescript-mcp-server"
+			],
+			"env": {
+				"LOG_LEVEL": "debug",
+				"ENABLE_ARBITRARY_SCRIPTS": "false",
+				"PLUGINS_BLOCKED_LIST": "experimental"
+			}
+		}
+	}
+}
+```
+</details>
+
+## Alternative: Local Development Setup
+
+For plugin development or customization:
+
+### 1. Clone Repository
+
+```bash
+git clone https://github.com/your-username/bb-mcp-applescript.git
+cd bb-mcp-applescript/server
+```
+
+### 2. Setup Environment
+
+```bash
+cp .env.example .env
+# Edit .env to customize
+```
+
+### 3. Run Locally
+
+```bash
+# Start server
+deno task start
+
+# Or with auto-reload:
+deno task dev
+```
+
+### 4. Configure in Beyond Better
+
+Add to BB Settings or Project Settings → MCP Servers:
+
+- **Server ID**: `applescript-dev`
+- **Display Name**: `AppleScript Tools (Dev)`
+- **Transport**: `STDIO (Local Process)`
+- **Command**: `deno`
+- **Arguments**:
+  ```
+  run
+  --allow-all
+  --unstable-kv
+  /FULL/PATH/TO/bb-mcp-applescript/server/main.ts
+  ```
+- **Environment Variables** (optional):
+  - `LOG_LEVEL`: `debug`
+  - `ENABLE_ARBITRARY_SCRIPTS`: `false`
+
+<details>
+<summary><strong>For Claude Desktop</strong></summary>
+
+```json
+{
+	"mcpServers": {
+		"applescript": {
+			"command": "deno",
+			"args": [
+				"run",
+				"--allow-all",
+				"--unstable-kv",
+				"/FULL/PATH/TO/bb-mcp-applescript/server/main.ts"
+			]
+		}
+	}
+}
+```
+</details>
+
 ## Common Issues
 
 ### Issue: Server won't start
@@ -96,26 +213,26 @@ Create a BBEdit notebook called "Test Notebook" with some sample text
 ```bash
 # Verify Deno version
 deno --version  # Should be 2.5.0+
-
-# Check for errors
-deno task start
 ```
 
 **Solution**: Update Deno if needed
 
-### Issue: Claude doesn't see the tools
+### Issue: BB/Claude doesn't see the tools
 
-**Check:**
-1. Is the path in `claude_desktop_config.json` absolute?
-2. Did you restart Claude Desktop after editing config?
-3. Is the server running? (Check terminal output)
+**For Beyond Better:**
+1. Check that server shows "Connected" status in MCP Servers settings
+2. Verify Command and Arguments are correct
+3. Check BB logs for connection errors
+
+**For Claude Desktop:**
+1. Did you restart Claude Desktop after editing config?
+2. Is the JSON valid? (Use a JSON validator)
+3. Check Claude Desktop logs
 
 **Solution**: 
-```bash
-# Get absolute path
-pwd
-# Use that in config with /main.ts at the end
-```
+- Verify configuration is saved correctly
+- Make sure you're using `jsr:@beyondbetter/bb-applescript-mcp-server`
+- Check that Deno is in your PATH
 
 ### Issue: Permission errors
 
@@ -165,10 +282,18 @@ It's a safety feature. To enable:
 - See `PROJECT_SUMMARY.md` for architecture details
 
 ### Extend the Server
-1. Create a new plugin in `src/plugins/myplugin.plugin/`
-2. Add AppleScript files to `scripts/` subdirectory
-3. Implement plugin interface in `plugin.ts`
+
+Create plugins for any scriptable macOS application!
+
+**📝 [Complete Plugin Creation Guide](../docs/creating-plugins.md)**
+
+Quick steps:
+1. Create `src/plugins/yourapp.plugin/` directory
+2. Add `plugin.ts` and `scripts/` subdirectory
+3. Implement tools that call AppleScript files
 4. Restart server - plugin auto-discovered!
+
+The guide includes complete working examples for Mail.app and Safari.
 
 ### Example: Add a Mail Plugin
 
