@@ -3,6 +3,7 @@
  */
 
 import type { Logger } from 'jsr:@beyondbetter/bb-mcp-server';
+import { toError } from 'jsr:@beyondbetter/bb-mcp-server';
 
 export type ErrorType = 'permission' | 'timeout' | 'script_error' | 'system_error' | 'disabled';
 
@@ -67,7 +68,7 @@ export function parseAppleScriptError(stderr: string, code?: number): ErrorType 
 export function extractErrorMessage(stderr: string): string {
 	// AppleScript errors often have format: "line:col: message"
 	const match = stderr.match(/\d+:\d+:\s*(.+)/);
-	if (match) {
+	if (match?.[1]) {
 		return match[1].trim();
 	}
 
@@ -119,20 +120,24 @@ export function createErrorResult(
 	code?: string,
 	details?: string,
 ): AppleScriptResult {
+	const errorObj: AppleScriptError = {
+		type: errorType,
+		message,
+		hint: generateErrorHint(errorType, message),
+	};
+	if (code !== undefined) errorObj.code = code;
+	if (details !== undefined) errorObj.details = details;
+
+	const metadata: AppleScriptResult['metadata'] = {
+		executionTime,
+		timeoutUsed: timeoutUsed || 0,
+	};
+	if (scriptPath !== undefined) metadata.scriptPath = scriptPath;
+
 	return {
 		success: false,
-		error: {
-			type: errorType,
-			message,
-			code,
-			hint: generateErrorHint(errorType, message),
-			details,
-		},
-		metadata: {
-			executionTime,
-			scriptPath,
-			timeoutUsed: timeoutUsed || 0,
-		},
+		error: errorObj,
+		metadata,
 	};
 }
 
@@ -145,14 +150,16 @@ export function createSuccessResult(
 	scriptPath?: string,
 	timeoutUsed?: number,
 ): AppleScriptResult {
+	const metadata: AppleScriptResult['metadata'] = {
+		executionTime,
+		timeoutUsed: timeoutUsed || 0,
+	};
+	if (scriptPath !== undefined) metadata.scriptPath = scriptPath;
+
 	return {
 		success: true,
 		result,
-		metadata: {
-			executionTime,
-			scriptPath,
-			timeoutUsed: timeoutUsed || 0,
-		},
+		metadata,
 	};
 }
 
@@ -160,7 +167,7 @@ export function createSuccessResult(
  * Log error with context
  */
 export function logError(logger: Logger, error: AppleScriptError, context: string): void {
-	logger.error(`AppleScript error in ${context}:`, {
+	logger.error(`AppleScript error in ${context}:`, toError(error), {
 		type: error.type,
 		message: error.message,
 		code: error.code,
