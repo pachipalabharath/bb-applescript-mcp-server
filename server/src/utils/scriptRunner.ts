@@ -5,6 +5,7 @@
 
 import { ensureDir } from 'jsr:@std/fs@^1.0.16';
 import type { Logger } from 'jsr:@beyondbetter/bb-mcp-server';
+import { errorMessage, toError } from 'jsr:@beyondbetter/bb-mcp-server';
 import {
 	AppleScriptResult,
 	createErrorResult,
@@ -249,9 +250,9 @@ export async function runAppleScript(options: ScriptRunOptions): Promise<AppleSc
 		const executionTime = performance.now() - startTime;
 		const message = error instanceof Error ? error.message : 'Unknown error';
 
-		options.logger?.error('AppleScript system error:', {
+		options.logger?.error('AppleScript system error:', toError(error), {
 			message,
-			error,
+			errorDetails: errorMessage(error),
 		});
 
 		return createErrorResult(
@@ -304,8 +305,8 @@ export async function compileAndRun(
 				const executionTime = performance.now() - startTime;
 
 				// Extract error line number if available
-				const lineMatch = stderrText.match(/:([0-9]+):/);  
-				const errorLine = lineMatch ? parseInt(lineMatch[1], 10) : undefined;
+				const lineMatch = stderrText.match(/:([0-9]+):/);
+				const errorLine = lineMatch?.[1] ? parseInt(lineMatch[1], 10) : undefined;
 
 				// Build enhanced error message with context
 				let errorMessage = `Compilation failed: ${extractErrorMessage(stderrText)}`;
@@ -346,11 +347,12 @@ export async function compileAndRun(
 			}
 
 			// Run the compiled script
-			const result = await runAppleScript({
+			const runOptions: ScriptRunOptions = {
 				script: tempFile + '.scpt',
 				timeout: validatedTimeout,
-				logger,
-			});
+			};
+			if (logger !== undefined) runOptions.logger = logger;
+			const result = await runAppleScript(runOptions);
 
 			// Save debug script for successful runs if configured
 			const debugFile = await saveDebugScript(scriptSource, result, debugConfig, logger);
@@ -373,9 +375,9 @@ export async function compileAndRun(
 		const executionTime = performance.now() - startTime;
 		const message = error instanceof Error ? error.message : 'Unknown error';
 
-		logger?.error('AppleScript compile/run error:', {
+		logger?.error('AppleScript compile/run error:', toError(error), {
 			message,
-			error,
+			errorDetails: errorMessage(error),
 		});
 
 		return createErrorResult(

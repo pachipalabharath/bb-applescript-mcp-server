@@ -1,6 +1,6 @@
 /**
  * Finder Tools
- * 
+ *
  * Collection of tools for interacting with macOS Finder.
  * Includes label management, file info, selection, and reveal operations.
  */
@@ -53,9 +53,7 @@ export function getTools(dependencies: ToolDependencies, pluginDir: string): Too
 							content: [
 								{
 									type: 'text',
-									text: typeof result.result === 'string'
-										? result.result
-										: JSON.stringify(result.result, null, 2),
+									text: typeof result.result === 'string' ? result.result : JSON.stringify(result.result, null, 2),
 								},
 							],
 						};
@@ -117,9 +115,7 @@ export function getTools(dependencies: ToolDependencies, pluginDir: string): Too
 							content: [
 								{
 									type: 'text',
-									text: typeof result.result === 'string'
-										? result.result
-										: JSON.stringify(result.result, null, 2),
+									text: typeof result.result === 'string' ? result.result : JSON.stringify(result.result, null, 2),
 								},
 							],
 						};
@@ -182,9 +178,7 @@ export function getTools(dependencies: ToolDependencies, pluginDir: string): Too
 							content: [
 								{
 									type: 'text',
-									text: typeof result.result === 'string'
-										? result.result
-										: JSON.stringify(result.result, null, 2),
+									text: typeof result.result === 'string' ? result.result : JSON.stringify(result.result, null, 2),
 								},
 							],
 						};
@@ -246,9 +240,7 @@ export function getTools(dependencies: ToolDependencies, pluginDir: string): Too
 							content: [
 								{
 									type: 'text',
-									text: typeof result.result === 'string'
-										? result.result
-										: JSON.stringify(result.result, null, 2),
+									text: typeof result.result === 'string' ? result.result : JSON.stringify(result.result, null, 2),
 								},
 							],
 						};
@@ -307,9 +299,7 @@ export function getTools(dependencies: ToolDependencies, pluginDir: string): Too
 							content: [
 								{
 									type: 'text',
-									text: typeof result.result === 'string'
-										? result.result
-										: JSON.stringify(result.result, null, 2),
+									text: typeof result.result === 'string' ? result.result : JSON.stringify(result.result, null, 2),
 								},
 							],
 						};

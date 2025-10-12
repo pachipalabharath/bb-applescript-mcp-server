@@ -66,7 +66,7 @@ export function toAppleScriptRecord(obj: Record<string, any>): string {
 /**
  * Tagged template literal function for AppleScript
  * Automatically escapes interpolated values and converts arrays/objects
- * 
+ *
  * Usage:
  * const name = "My Notebook";
  * const items = ["file1.txt", "file2.txt"];
@@ -105,7 +105,7 @@ export function script(strings: TemplateStringsArray, ...values: any[]): string 
 /**
  * Renders a template string with variables
  * Alternative to tagged template literals for dynamic template loading
- * 
+ *
  * @param template - Template string with ${variable} markers
  * @param variables - Object with variable values
  * @returns Rendered AppleScript code
