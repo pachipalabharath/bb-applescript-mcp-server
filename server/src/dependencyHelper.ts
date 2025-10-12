@@ -5,8 +5,15 @@
  * When running from JSR, plugins must be statically imported since filesystem discovery doesn't work.
  */
 
-import type { AppServerDependencies } from '@beyondbetter/bb-mcp-server';
-import type { AppPlugin } from '@beyondbetter/bb-mcp-server';
+import { dirname, relative, resolve } from 'jsr:@std/path';
+
+import type {
+  AppPlugin,
+  AppServerDependencies,
+  CreateCustomAppServerDependencies,
+  Logger,
+  PluginManagerConfig,
+} from '@beyondbetter/bb-mcp-server';
 
 // Static imports for JSR deployment
 import standardPlugin from './plugins/standard.plugin/plugin.ts';
@@ -59,57 +66,85 @@ export function getStaticPlugins(): AppPlugin[] {
  * This function detects the runtime environment and provides appropriate
  * plugin configuration:
  * - JSR: Static plugins for built-in tools + user can provide custom plugins via PLUGINS_DISCOVERY_PATHS
- * - Local: Static plugins as fallback + dynamic discovery enabled by default
+ * - Local: dynamic discovery
  *
  * In both modes, users can add their own plugins by:
  * 1. Setting PLUGINS_DISCOVERY_PATHS environment variable (e.g., "./my-plugins")
  * 2. Setting PLUGINS_AUTOLOAD=true (default)
  *
- * The built-in plugins (standard-tools, bbedit) are always available via static loading,
+ * The built-in plugins (standard-tools, bbedit) are always available,
  * and user plugins are discovered from the filesystem.
  *
  * @returns Partial dependencies with plugin configuration
  */
-export async function createAppleScriptDependencies(): Promise<Partial<AppServerDependencies>> {
+export async function createAppleScriptDependencies(
+  appDependencies: CreateCustomAppServerDependencies,
+): Promise<Partial<AppServerDependencies>> {
+  const { configManager, logger } = appDependencies;
+
   const runningFromJsr = isRunningFromJsr();
+
+  // Log runtime information
+  logRuntimeInfo(logger, runningFromJsr);
+
+  const dependencies: Partial<AppServerDependencies> = {
+    // 🎯 Library dependencies (from bb-mcp-server)
+    configManager,
+    logger,
+
+    serverConfig: {
+      name: 'applescript-mcp-server',
+      version: '0.1.0',
+      title: 'AppleScript MCP Server',
+      description: 'MCP server for executing AppleScript scripts to interact with macOS applications',
+    },
+  };
 
   if (runningFromJsr) {
     // JSR mode: Static plugins for built-in tools
     // User plugins can still be loaded from PLUGINS_DISCOVERY_PATHS
-    console.log('🌐 Running from JSR - built-in plugins loaded statically');
-    console.log('   User plugins can be added via PLUGINS_DISCOVERY_PATHS environment variable');
+    logger.info('🌐 Running from JSR - built-in plugins loaded statically');
+    logger.info('   User plugins can be added via PLUGINS_DISCOVERY_PATHS environment variable');
 
-    return {
-      staticPlugins: getStaticPlugins(),
-      // Note: PluginManager will still discover user plugins from PLUGINS_DISCOVERY_PATHS
-      // if PLUGINS_AUTOLOAD=true (default). This allows users to extend the server
-      // with custom plugins even when running from JSR.
-    };
+    // Note: PluginManager will still discover user plugins from PLUGINS_DISCOVERY_PATHS
+    // if PLUGINS_AUTOLOAD=true (default). This allows users to extend the server
+    // with custom plugins even when running from JSR.
+    dependencies.staticPlugins = getStaticPlugins();
   } else {
     // Local mode: Static plugins as fallback + dynamic discovery
-    console.log(
-      '💻 Running locally - built-in plugins loaded statically + dynamic discovery enabled',
+    logger.info(
+      '💻 Running locally - built-in plugins loaded dynamically',
     );
 
-    return {
-      // Provide static plugins as fallback
-      // Dynamic discovery will add to these if enabled
-      staticPlugins: getStaticPlugins(),
-    };
+    // Get current module's directory and resolve core plugin path relative to CWD
+    const moduleDir = dirname(new URL(import.meta.url).pathname);
+    const corePluginPath = relative(Deno.cwd(), resolve(moduleDir, './plugins'));
+
+    const pluginManagerConfig = configManager.get<PluginManagerConfig>('pluginManager');
+    const existingPaths = pluginManagerConfig.paths || [];
+
+    // Normalize paths and check for duplicates
+    const normalizedCorePath = corePluginPath.replace(/\\/g, '/'); // normalize path separators
+    const normalizedExistingPaths = existingPaths.map((p: string) => p.replace(/\\/g, '/'));
+
+    // Add core path only if not already present
+    if (!normalizedExistingPaths.includes(normalizedCorePath)) {
+      configManager.set('pluginManager.paths', [normalizedCorePath, ...existingPaths]);
+    }
   }
+
+  return dependencies;
 }
 
 /**
  * Log runtime information for debugging
  */
-export function logRuntimeInfo(): void {
-  const runningFromJsr = isRunningFromJsr();
+export function logRuntimeInfo(logger: Logger, runningFromJsr: boolean): void {
   const importUrl = import.meta.url;
 
-  console.log('📦 AppleScript MCP Server Runtime Info:');
-  console.log(`   Import URL: ${importUrl}`);
-  console.log(`   Running from JSR: ${runningFromJsr ? 'Yes' : 'No'}`);
-  console.log(
-    `   Plugin loading: ${runningFromJsr ? 'Static only' : 'Dynamic discovery + Static'}`,
-  );
+  const loadedUsing = runningFromJsr ? 'Static + Dynamic discovery' : 'Dynamic discovery only';
+  logger.info('📦 AppleScript MCP Server Runtime Info:');
+  logger.info(`   Import URL: ${importUrl}`);
+  logger.info(`   Running from JSR: ${runningFromJsr ? 'Yes' : 'No'}`);
+  logger.info(`   Plugin loading: ${loadedUsing}`);
 }

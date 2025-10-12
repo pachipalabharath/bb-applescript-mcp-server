@@ -3,13 +3,7 @@
  * Provides tools for working with BBEdit notebooks and projects
  */
 
-import {
-  AppPlugin,
-  ToolRegistration,
-  ToolRegistry,
-  WorkflowBase,
-  WorkflowRegistry,
-} from 'jsr:@beyondbetter/bb-mcp-server';
+import { AppPlugin, ToolRegistration, ToolRegistry, WorkflowBase, WorkflowRegistry } from '@beyondbetter/bb-mcp-server';
 import { dirname, fromFileUrl } from '@std/path';
 import { z } from 'zod';
 import { findAndExecuteScript } from '../../utils/scriptLoader.ts';
