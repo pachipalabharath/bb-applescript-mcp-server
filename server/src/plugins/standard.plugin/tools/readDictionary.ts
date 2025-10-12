@@ -11,6 +11,39 @@ import { createErrorResult } from '../../../utils/errorHandler.ts';
 import { extractSdefQueryXml, parseSdefFull, parseSdefOverview, parseSdefQuery } from '../../../utils/sdefParser.ts';
 import type { ToolConfig, ToolDependencies } from '../../../types/toolTypes.ts';
 
+// Define input schema for type inference
+const readDictionaryInputSchema = {
+	application: z.string().describe('Name of the application (e.g., "BBEdit", "Finder")'),
+	mode: z
+		.enum(['overview', 'query', 'full'])
+		.default('overview')
+		.describe(
+			'Output mode: overview (structured summary), query (specific items), full (complete dictionary)',
+		),
+	outputFormat: z
+		.enum(['json', 'xml'])
+		.default('json')
+		.describe(
+			'Output format: json (structured data) or xml (raw sdef XML). JSON is recommended for LLM consumption.',
+		),
+	query: z
+		.array(z.string())
+		.optional()
+		.describe(
+			'Query for specific items (mode=query only). Format: "type:name" (e.g., ["class:document", "command:open"])',
+		),
+	timeout: z.number().optional().describe('Timeout in milliseconds'),
+} as const;
+
+// Infer the type from the schema
+type ReadDictionaryArgs = {
+	application: string;
+	mode?: 'overview' | 'query' | 'full';
+	outputFormat?: 'json' | 'xml';
+	query?: string[];
+	timeout?: number;
+};
+
 export function getTools(dependencies: ToolDependencies): ToolConfig<any>[] {
 	const { logger } = dependencies;
 
@@ -22,34 +55,13 @@ export function getTools(dependencies: ToolDependencies): ToolConfig<any>[] {
 				description:
 					'Read the AppleScript dictionary for an application. Returns available classes, commands, properties, and events. Use this to understand what AppleScript operations are available for an application.',
 				category: 'AppleScript',
-				inputSchema: {
-					application: z.string().describe('Name of the application (e.g., "BBEdit", "Finder")'),
-					mode: z
-						.enum(['overview', 'query', 'full'])
-						.default('overview')
-						.describe(
-							'Output mode: overview (structured summary), query (specific items), full (complete dictionary)',
-						),
-					outputFormat: z
-						.enum(['json', 'xml'])
-						.default('json')
-						.describe(
-							'Output format: json (structured data) or xml (raw sdef XML). JSON is recommended for LLM consumption.',
-						),
-					query: z
-						.array(z.string())
-						.optional()
-						.describe(
-							'Query for specific items (mode=query only). Format: "type:name" (e.g., ["class:document", "command:open"])',
-						),
-					timeout: z.number().optional().describe('Timeout in milliseconds'),
-				},
+				inputSchema: readDictionaryInputSchema,
 			},
-			handler: async (args) => {
+			handler: (async (args: ReadDictionaryArgs) => {
 				try {
 					logger.info(`Reading dictionary for ${args.application}`);
 
-					const timeoutMs = args.timeout || 30000;
+					const timeoutMs = args.timeout ?? 30000;
 
 					// First, resolve the application name to its full path using AppleScript
 					// sdef requires the full path, not just the app name
@@ -316,7 +328,7 @@ export function getTools(dependencies: ToolDependencies): ToolConfig<any>[] {
 						isError: true,
 					};
 				}
-			},
+			}) as any,
 		},
 	];
 }

@@ -51,17 +51,6 @@ tell application "BBEdit"
 	-- Settings handling can be expanded in future
 	-- For now, we just create the basic project
 	
-	-- Save the project
-	--try
-	--	set saveFile to POSIX file (POSIX path of saveLocation & projectFileName)
-	--	save newProject to saveFile
-	--on error errMsg
-	--	return "Error: Failed to save project - " & errMsg
-	--end try
-	
-	-- Get saved path
-	--set savedPath to POSIX path of (file of newProject as alias)
-	
 	-- Optionally open the project
 	set shouldOpenProject to ${shouldOpen}
 	if shouldOpenProject is missing value or shouldOpenProject is true then
@@ -75,6 +64,6 @@ tell application "BBEdit"
 	end if
 	
 	-- Return success with project info
-	--return "{\"success\":true,\"projectName\":\"" & projectName & "\",\"projectPath\":\"" & savedPath & "\"}"
-	return "{\"success\":true,\"projectName\":\"" & projectName & "\"}"
+	return "{\"success\":true,\"projectName\":\"" & projectName & "\",\"projectPath\":\"" &  (POSIX path of projectPath) & "\"}"
+	--return "{\"success\":true,\"projectName\":\"" & projectName & "\"}"
 end tell

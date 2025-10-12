@@ -8,6 +8,23 @@ import { z } from 'zod';
 import { findAndExecuteScript } from '../../../utils/scriptLoader.ts';
 import type { ToolConfig, ToolDependencies } from '../../../types/toolTypes.ts';
 
+// Define input schema for type inference
+const checkPermissionsInputSchema = {
+	applications: z
+		.array(z.string())
+		.optional()
+		.describe(
+			'List of application names to check (e.g., ["Finder", "BBEdit"]). If not provided, checks common applications.',
+		),
+	timeout: z.number().optional().describe('Timeout in milliseconds'),
+} as const;
+
+// Infer the type from the schema
+type CheckPermissionsArgs = {
+	applications: string[];
+	timeout?: number;
+};
+
 export function getTools(dependencies: ToolDependencies, pluginDir: string): ToolConfig<any>[] {
 	const { logger } = dependencies;
 
@@ -19,17 +36,9 @@ export function getTools(dependencies: ToolDependencies, pluginDir: string): Too
 				description:
 					'Check if automation permissions are granted for specified applications. Returns status for each application and instructions for granting permissions if needed.',
 				category: 'AppleScript',
-				inputSchema: {
-					applications: z
-						.array(z.string())
-						.optional()
-						.describe(
-							'List of application names to check (e.g., ["Finder", "BBEdit"]). If not provided, checks common applications.',
-						),
-					timeout: z.number().optional().describe('Timeout in milliseconds'),
-				},
+				inputSchema: checkPermissionsInputSchema,
 			},
-			handler: async (args) => {
+			handler: (async (args: CheckPermissionsArgs) => {
 				try {
 					logger.info('Checking AppleScript permissions');
 
@@ -77,7 +86,7 @@ export function getTools(dependencies: ToolDependencies, pluginDir: string): Too
 						isError: true,
 					};
 				}
-			},
+			}) as any,
 		},
 	];
 }

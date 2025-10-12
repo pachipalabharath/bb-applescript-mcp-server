@@ -11,7 +11,7 @@ function getDirectChildren(parent: Element, tagName: string): Element[] {
 	const result: Element[] = [];
 	for (let i = 0; i < parent.childNodes.length; i++) {
 		const child = parent.childNodes[i];
-		if (child.nodeType === 1) { // Element node
+		if (child && child.nodeType === 1) { // Element node
 			const element = child as Element;
 			if (element.tagName === tagName) {
 				result.push(element);
@@ -46,7 +46,7 @@ export function parseSdefOverview(sdefXml: string, applicationName: string): any
 	// Check for parse errors
 	const parseErrors = doc.getElementsByTagName('parsererror');
 	if (parseErrors.length > 0) {
-		throw new Error(`XML parse error: ${parseErrors[0].textContent}`);
+		throw new Error(`XML parse error: ${parseErrors[0]?.textContent || 'Unknown parse error'}`);
 	}
 
 	const overview: any = {
@@ -151,7 +151,7 @@ export function parseSdefFull(sdefXml: string, applicationName: string): any {
 	// Check for parse errors
 	const parseErrors = doc.getElementsByTagName('parsererror');
 	if (parseErrors.length > 0) {
-		throw new Error(`XML parse error: ${parseErrors[0].textContent}`);
+		throw new Error(`XML parse error: ${parseErrors[0]?.textContent || 'Unknown parse error'}`);
 	}
 
 	const fullData: any = {
@@ -217,10 +217,11 @@ export function parseSdefFull(sdefXml: string, applicationName: string): any {
 
 			const directParameters = getDirectChildren(cmd, 'direct-parameter');
 			if (directParameters.length > 0) {
+				const directParam = directParameters[0]!;
 				commandData.direct_parameter = {
-					type: directParameters[0].getAttribute('type'),
-					description: directParameters[0].getAttribute('description'),
-					optional: directParameters[0].getAttribute('optional') === 'yes',
+					type: directParam.getAttribute('type'),
+					description: directParam.getAttribute('description'),
+					optional: directParam.getAttribute('optional') === 'yes',
 				};
 			}
 
@@ -235,9 +236,10 @@ export function parseSdefFull(sdefXml: string, applicationName: string): any {
 
 			const results = getDirectChildren(cmd, 'result');
 			if (results.length > 0) {
+				const result = results[0]!;
 				commandData.result = {
-					type: results[0].getAttribute('type'),
-					description: results[0].getAttribute('description'),
+					type: result.getAttribute('type'),
+					description: result.getAttribute('description'),
 				};
 			}
 
@@ -296,7 +298,7 @@ export function extractSdefQueryXml(sdefXml: string, queries: string[]): string 
 	// Check for parse errors
 	const parseErrors = doc.getElementsByTagName('parsererror');
 	if (parseErrors.length > 0) {
-		throw new Error(`XML parse error: ${parseErrors[0].textContent}`);
+		throw new Error(`XML parse error: ${parseErrors[0]?.textContent || 'Unknown parse error'}`);
 	}
 
 	const serializer = new XMLSerializer();
@@ -347,7 +349,7 @@ export function parseSdefQuery(sdefXml: string, queries: string[], applicationNa
 	// Check for parse errors
 	const parseErrors = doc.getElementsByTagName('parsererror');
 	if (parseErrors.length > 0) {
-		throw new Error(`XML parse error: ${parseErrors[0].textContent}`);
+		throw new Error(`XML parse error: ${parseErrors[0]?.textContent || 'Unknown parse error'}`);
 	}
 
 	const result: any = {
@@ -413,9 +415,10 @@ export function parseSdefQuery(sdefXml: string, queries: string[], applicationNa
 			} else if (type === 'command') {
 				const directParams = getDirectChildren(element, 'direct-parameter');
 				if (directParams.length > 0) {
+					const directParam = directParams[0]!;
 					itemData.direct_parameter = {
-						type: directParams[0].getAttribute('type'),
-						description: directParams[0].getAttribute('description'),
+						type: directParam.getAttribute('type'),
+						description: directParam.getAttribute('description'),
 					};
 				}
 
@@ -429,9 +432,10 @@ export function parseSdefQuery(sdefXml: string, queries: string[], applicationNa
 
 				const results = getDirectChildren(element, 'result');
 				if (results.length > 0) {
+					const result = results[0]!;
 					itemData.result = {
-						type: results[0].getAttribute('type'),
-						description: results[0].getAttribute('description'),
+						type: result.getAttribute('type'),
+						description: result.getAttribute('description'),
 					};
 				}
 			} else if (type === 'enumeration') {
