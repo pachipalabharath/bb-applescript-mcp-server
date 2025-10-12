@@ -12,27 +12,33 @@ import { dirname, fromFileUrl } from '@std/path';
  * - **JSR mode**: Returns a virtual path extracted from the JSR URL that works for dynamic imports
  * - **Local mode**: Returns the actual filesystem path
  * 
- * This should be called from within a plugin file using `import.meta.url`.
- * 
+ * @param moduleUrl - The `import.meta.url` from the calling plugin
  * @returns The directory path of the calling plugin
  * 
  * @example
  * ```typescript
  * // In a plugin file (e.g., server/src/plugins/my-plugin/plugin.ts)
- * const pluginDir = getPluginDir();
- * // JSR: returns "server/src/plugins/my-plugin"
- * // Local: returns "/absolute/path/to/server/src/plugins/my-plugin"
+ * const pluginDir = getPluginDir(import.meta.url);
+ * 
+ * // JSR mode:
+ * // Returns: "https://jsr.io/@scope/pkg@1.0.0/server/src/plugins/my-plugin"
+ * // (Full URL that can be used for dynamic imports)
+ * 
+ * // Local mode:
+ * // Returns: "/absolute/path/to/server/src/plugins/my-plugin"
+ * // (Filesystem path)
  * ```
  */
-export function getPluginDir(): string {
-  const currentFileUrl = import.meta.url;
+export function getPluginDir(moduleUrl: string): string {
+  const currentFileUrl = moduleUrl;
   
   if (currentFileUrl.startsWith('https://')) {
-    // JSR mode: Extract path from JSR URL
+    // JSR mode: Keep the full URL base for dynamic imports
     // e.g., "https://jsr.io/@scope/pkg@1.0.0/server/src/plugins/plugin.ts"
-    // becomes "server/src/plugins"
+    // becomes "https://jsr.io/@scope/pkg@1.0.0/server/src/plugins"
     const url = new URL(currentFileUrl);
-    return dirname(url.pathname.replace(/^\/@[^/]+\/[^/]+@[^/]+\//, ''));
+    const dirPath = dirname(url.pathname);
+    return `${url.origin}${dirPath}`;
   }
   
   // Local mode: Convert file:// URL to filesystem path

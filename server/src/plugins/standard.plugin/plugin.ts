@@ -25,7 +25,7 @@ export default {
     workflowRegistry: WorkflowRegistry,
   ): Promise<void> {
     const logger = dependencies.logger;
-    const pluginDir = getPluginDir();
+    const pluginDir = getPluginDir(import.meta.url);
 
     // Collect all tools from the tool modules
     // scriptLoader.ts will automatically detect and use inlined scripts (JSR) or files (local)

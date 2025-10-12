@@ -99,7 +99,7 @@ export default {
     workflowRegistry: WorkflowRegistry,
   ): Promise<void> {
     const logger = dependencies.logger;
-    const pluginDir = getPluginDir();
+    const pluginDir = getPluginDir(import.meta.url);
 
     // Register create_notebook tool
     toolRegistry.registerTool(
