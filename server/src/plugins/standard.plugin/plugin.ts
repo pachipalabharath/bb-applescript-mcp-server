@@ -4,6 +4,7 @@
  * and Finder operations that don't have simple CLI equivalents
  */
 
+// INJECT_STATIC_IMPORT: ./scripts/index.ts
 import { AppPlugin, ToolRegistration, ToolRegistry, WorkflowBase, WorkflowRegistry } from '@beyondbetter/bb-mcp-server';
 import { getTools as getRunScriptTools } from './tools/runScript.ts';
 import { getTools as getReadDictionaryTools } from './tools/readDictionary.ts';
