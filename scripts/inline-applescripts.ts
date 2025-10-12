@@ -119,6 +119,50 @@ async function processScriptsDirectory(scriptsDir: string): Promise<void> {
   console.log(`  ✓ Generated index.ts with ${scriptCount} script(s)`);
 }
 
+/**
+ * Inject static imports into plugin files for JSR tree-shaking
+ * Replaces comment markers with actual import statements
+ */
+async function injectStaticImports(): Promise<void> {
+  console.log('\nInjecting static imports into plugin files...');
+
+  // Find all plugin.ts files in the plugins directory
+  const pluginFiles: string[] = [];
+  for await (
+    const entry of walk(SERVER_ROOT, {
+      exts: ['.ts'],
+      match: [/\/plugin\.ts$/],
+    })
+  ) {
+    pluginFiles.push(entry.path);
+  }
+
+  for (const pluginFile of pluginFiles) {
+    const content = await Deno.readTextFile(pluginFile);
+
+    // Check if file contains injection marker
+    const markerRegex = /^\/\/ INJECT_STATIC_IMPORT: (.+)$/gm;
+    const matches = content.match(markerRegex);
+
+    if (matches) {
+      let modified = content;
+
+      // Replace each marker with actual import
+      for (const match of matches) {
+        const pathMatch = match.match(/INJECT_STATIC_IMPORT: (.+)$/);
+        if (pathMatch) {
+          const importPath = pathMatch[1];
+          const importStatement = `import '${importPath}';`;
+          modified = modified.replace(match, importStatement);
+        }
+      }
+
+      await Deno.writeTextFile(pluginFile, modified);
+      console.log(`  ✓ Injected imports in ${relative('.', pluginFile)}`);
+    }
+  }
+}
+
 async function main() {
   console.log('\n🔨 Inlining AppleScript files for JSR compatibility...\n');
 
@@ -133,7 +177,10 @@ async function main() {
     await processScriptsDirectory(dir);
   }
 
-  console.log('\n✅ Done! Generated index.ts files are ready for JSR publishing.\n');
+  // Inject static imports into plugin files
+  await injectStaticImports();
+
+  console.log('\n✅ Done! Generated index.ts files and injected imports are ready for JSR publishing.\n');
 }
 
 if (import.meta.main) {

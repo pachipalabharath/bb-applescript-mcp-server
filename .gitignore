@@ -20,4 +20,6 @@ docs/.obsidian
 playground/
 
 # Generated files for JSR (created by build:jsr task)
+# - scripts/index.ts files with inlined AppleScript content
+# - Modified plugin.ts files with injected static imports
 server/src/plugins/**/scripts/index.ts

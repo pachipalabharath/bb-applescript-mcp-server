@@ -3,6 +3,7 @@
  * Provides tools for working with BBEdit notebooks and projects
  */
 
+// INJECT_STATIC_IMPORT: ./scripts/index.ts
 import { AppPlugin, ToolRegistration, ToolRegistry, WorkflowBase, WorkflowRegistry } from '@beyondbetter/bb-mcp-server';
 import { z } from 'zod';
 import { findAndExecuteScript } from '../../utils/scriptLoader.ts';
