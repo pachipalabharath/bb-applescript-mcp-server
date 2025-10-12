@@ -399,9 +399,38 @@ Create a new BBEdit project.
 
 ## Plugin Management
 
+### Plugin Loading Strategy
+
+This server uses a **hybrid plugin loading approach** that automatically adapts to the runtime environment:
+
+- **JSR Mode**: When running from JSR (e.g., `jsr:@beyondbetter/bb-applescript-mcp-server`):
+  - Built-in plugins (standard-tools, bbedit) are statically loaded
+  - User plugins can be loaded from local directories via `PLUGINS_DISCOVERY_PATHS`
+  - Allows users to extend the server with custom plugins
+
+- **Local Mode**: When running from a local directory:
+  - Built-in plugins are statically loaded as fallback
+  - Dynamic discovery enabled by default
+  - Hot-reload support during development
+
+The server automatically detects which mode it's running in and configures plugin loading appropriately. No configuration is needed - it just works!
+
+**📖 For technical details**, see [Plugin Loading Documentation](docs/PLUGIN_LOADING.md)
+
+#### Adding Custom Plugins
+
+You can add your own plugins even when running from JSR:
+
+1. Create a plugin directory: `mkdir ~/my-applescript-plugins`
+2. Add your plugin files (see [plugin guide](docs/creating-plugins.md))
+3. Set environment variable: `PLUGINS_DISCOVERY_PATHS=/path/to/your/plugins`
+4. Restart the server
+
+Your custom plugins will be discovered and loaded alongside the built-in plugins.
+
 ### Loading Plugins
 
-Plugins are auto-discovered from `src/plugins/` directory.
+Plugins are auto-discovered from `src/plugins/` directory (local mode) or statically loaded (JSR mode).
 
 **Load all plugins** (default):
 
