@@ -5,7 +5,7 @@
  * When running from JSR, plugins must be statically imported since filesystem discovery doesn't work.
  */
 
-import { dirname, relative, resolve } from 'jsr:@std/path';
+import { dirname, relative, resolve } from 'jsr:@std/path@^1.1.2';
 
 import type {
   AppPlugin,
