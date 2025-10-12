@@ -52,8 +52,8 @@ export function parseAppleScriptError(stderr: string, code?: number): ErrorType 
 		stderrLower.includes('syntax error') ||
 		stderrLower.includes('execution error') ||
 		stderrLower.includes('expected') ||
-		stderrLower.includes('can\'t get') ||
-		stderrLower.includes('can\'t make')
+		stderrLower.includes("can't get") ||
+		stderrLower.includes("can't make")
 	) {
 		return 'script_error';
 	}
@@ -92,8 +92,8 @@ export function generateErrorHint(errorType: ErrorType, message: string): string
 			if (message.toLowerCase().includes('syntax error')) {
 				return 'There is a syntax error in the AppleScript. Check the script for proper AppleScript syntax.';
 			}
-			if (message.toLowerCase().includes('can\'t get') || message.toLowerCase().includes('can\'t make')) {
-				return 'The script tried to access something that doesn\'t exist. Verify the object/property exists before accessing it.';
+			if (message.toLowerCase().includes("can't get") || message.toLowerCase().includes("can't make")) {
+				return "The script tried to access something that doesn't exist. Verify the object/property exists before accessing it.";
 			}
 			return 'The script encountered an execution error. Review the error message and check the script logic.';
 

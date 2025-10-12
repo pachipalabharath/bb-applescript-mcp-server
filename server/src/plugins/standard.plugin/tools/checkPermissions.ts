@@ -1,6 +1,6 @@
 /**
  * Check AppleScript Permissions Tool
- * 
+ *
  * Checks if automation permissions are granted for specified applications.
  */
 

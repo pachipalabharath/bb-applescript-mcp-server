@@ -61,28 +61,32 @@ Read the AppleScript dictionary for any application to understand its scriptable
 **Example Usage**:
 
 **Overview Mode (Discovery):**
+
 ```json
 {
 	"application": "BBEdit",
 	"mode": "overview"
 }
 ```
+
 Returns structured summary organized by suites with counts:
+
 ```json
 {
-  "application": "BBEdit",
-  "suites": [
-    {
-      "name": "Standard Suite",
-      "classes": [{"name": "document", "properties_count": 10, "elements_count": 2}],
-      "commands": [{"name": "open", "parameters_count": 3}],
-      "enumerations": [{"name": "save_options", "values": ["yes", "no", "ask"]}]
-    }
-  ]
+	"application": "BBEdit",
+	"suites": [
+		{
+			"name": "Standard Suite",
+			"classes": [{ "name": "document", "properties_count": 10, "elements_count": 2 }],
+			"commands": [{ "name": "open", "parameters_count": 3 }],
+			"enumerations": [{ "name": "save_options", "values": ["yes", "no", "ask"] }]
+		}
+	]
 }
 ```
 
 **Query Mode (Targeted Details):**
+
 ```json
 {
 	"application": "BBEdit",
@@ -91,9 +95,11 @@ Returns structured summary organized by suites with counts:
 	"outputFormat": "json"
 }
 ```
+
 Returns complete details for specified items including all parameters, properties, and codes.
 
 **Full Mode (Complete Dictionary):**
+
 ```json
 {
 	"application": "Finder",
@@ -101,6 +107,7 @@ Returns complete details for specified items including all parameters, propertie
 	"outputFormat": "json"
 }
 ```
+
 Returns complete dictionary with full details for all classes, commands, enumerations, and events.
 
 **Use Cases**:
@@ -412,18 +419,18 @@ Plugins can be controlled via environment variables:
 1. Check if BBEdit is installed and has permissions:
 
    ```json
-   {"tool": "check_applescript_permissions", "applications": ["BBEdit"]}
+   { "tool": "check_applescript_permissions", "applications": ["BBEdit"] }
    ```
 
 2. Read BBEdit dictionary to understand project commands:
 
    ```json
-   {"tool": "read_dictionary", "application": "BBEdit", "filter": {"searchTerms": ["project"]}}
+   { "tool": "read_dictionary", "application": "BBEdit", "filter": { "searchTerms": ["project"] } }
    ```
 
 3. Create the project with files:
    ```json
-   {"tool": "create_bbedit_project", "name": "My Project", "items": ["/path/to/src", "/path/to/docs"]}
+   { "tool": "create_bbedit_project", "name": "My Project", "items": ["/path/to/src", "/path/to/docs"] }
    ```
 
 ### Workflow 2: Organizing Files with Labels
@@ -431,18 +438,18 @@ Plugins can be controlled via environment variables:
 1. Get current Finder selection:
 
    ```json
-   {"tool": "get_finder_selection"}
+   { "tool": "get_finder_selection" }
    ```
 
 2. Set labels based on file type or other criteria:
 
    ```json
-   {"tool": "set_file_label", "paths": ["/path/to/file.txt"], "labelIndex": 4}
+   { "tool": "set_file_label", "paths": ["/path/to/file.txt"], "labelIndex": 4 }
    ```
 
 3. Verify labels were set:
    ```json
-   {"tool": "get_file_label", "paths": ["/path/to/file.txt"]}
+   { "tool": "get_file_label", "paths": ["/path/to/file.txt"] }
    ```
 
 ### Workflow 3: Custom Automation (Advanced)
@@ -452,7 +459,7 @@ Only available when `ENABLE_ARBITRARY_SCRIPTS=true`:
 1. Read dictionary to understand available commands:
 
    ```json
-   {"tool": "read_dictionary", "application": "ApplicationName", "filter": {"format": "full"}}
+   { "tool": "read_dictionary", "application": "ApplicationName", "filter": { "format": "full" } }
    ```
 
 2. Write and test script:

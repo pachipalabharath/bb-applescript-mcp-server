@@ -69,6 +69,7 @@ Edit `~/Library/Application Support/Claude/claude_desktop_config.json`:
 ```
 
 Restart Claude Desktop.
+
 </details>
 
 ### 3. Start Using
@@ -78,21 +79,25 @@ Restart Claude Desktop.
 In Beyond Better (or Claude), try these commands:
 
 **Check permissions:**
+
 ```
 Check what AppleScript permissions are available
 ```
 
 **Get Finder selection:**
+
 ```
 What files are currently selected in Finder?
 ```
 
 **Read an app dictionary:**
+
 ```
 Show me what BBEdit commands are available for projects
 ```
 
 **Create a BBEdit notebook:**
+
 ```
 Create a BBEdit notebook called "Test Notebook" with some sample text
 ```
@@ -106,12 +111,12 @@ The JSR version runs with safe defaults, but you can customize using environment
 1. Edit your server in **MCP Servers** settings
 2. Add **Environment Variables**:
 
-| Key | Value | Purpose |
-|-----|-------|----------|
-| `LOG_LEVEL` | `debug` | Enable detailed logging |
-| `ENABLE_ARBITRARY_SCRIPTS` | `false` | Enable run_script tool (security risk!) |
-| `PLUGINS_ALLOWED_LIST` | `standard-tools,bbedit` | Load only specific plugins |
-| `PLUGINS_BLOCKED_LIST` | `experimental` | Block specific plugins |
+| Key                        | Value                   | Purpose                                 |
+| -------------------------- | ----------------------- | --------------------------------------- |
+| `LOG_LEVEL`                | `debug`                 | Enable detailed logging                 |
+| `ENABLE_ARBITRARY_SCRIPTS` | `false`                 | Enable run_script tool (security risk!) |
+| `PLUGINS_ALLOWED_LIST`     | `standard-tools,bbedit` | Load only specific plugins              |
+| `PLUGINS_BLOCKED_LIST`     | `experimental`          | Block specific plugins                  |
 
 <details>
 <summary><strong>For Claude Desktop (JSON config)</strong></summary>
@@ -136,6 +141,7 @@ The JSR version runs with safe defaults, but you can customize using environment
 	}
 }
 ```
+
 </details>
 
 ## Alternative: Local Development Setup
@@ -203,6 +209,7 @@ Add to BB Settings or Project Settings → MCP Servers:
 	}
 }
 ```
+
 </details>
 
 ## Common Issues
@@ -210,6 +217,7 @@ Add to BB Settings or Project Settings → MCP Servers:
 ### Issue: Server won't start
 
 **Check:**
+
 ```bash
 # Verify Deno version
 deno --version  # Should be 2.5.0+
@@ -220,16 +228,19 @@ deno --version  # Should be 2.5.0+
 ### Issue: BB/Claude doesn't see the tools
 
 **For Beyond Better:**
+
 1. Check that server shows "Connected" status in MCP Servers settings
 2. Verify Command and Arguments are correct
 3. Check BB logs for connection errors
 
 **For Claude Desktop:**
+
 1. Did you restart Claude Desktop after editing config?
 2. Is the JSON valid? (Use a JSON validator)
 3. Check Claude Desktop logs
 
-**Solution**: 
+**Solution**:
+
 - Verify configuration is saved correctly
 - Make sure you're using `jsr:@beyondbetter/bb-applescript-mcp-server`
 - Check that Deno is in your PATH
@@ -237,13 +248,14 @@ deno --version  # Should be 2.5.0+
 ### Issue: Permission errors
 
 **Solution:**
+
 1. Try the operation - macOS will prompt for permission
 2. Or go to System Settings > Privacy & Security > Automation
 3. Enable automation for Terminal (or whatever is running the server)
 
 ### Issue: "run_script is disabled"
 
-**This is intentional!** 
+**This is intentional!**
 
 It's a safety feature. To enable:
 
@@ -259,24 +271,28 @@ It's a safety feature. To enable:
 ## What's Available?
 
 ### AppleScript Tools
+
 - `run_script` - Run arbitrary AppleScript (disabled by default)
 - `read_dictionary` - Read app scripting dictionaries
 - `check_applescript_permissions` - Check automation permissions
 
 ### Finder Tools
+
 - `set_file_label` - Set Finder label colors
-- `get_file_label` - Get Finder label colors  
+- `get_file_label` - Get Finder label colors
 - `get_file_info_extended` - Get detailed file info
 - `reveal_in_finder` - Reveal files in Finder
 - `get_finder_selection` - Get selected Finder items
 
 ### BBEdit Tools
+
 - `create_bbedit_notebook` - Create BBEdit notebooks
 - `create_bbedit_project` - Create BBEdit projects
 
 ## Next Steps
 
 ### Learn More
+
 - Read `README.md` for detailed documentation
 - Check `mcp_server_instructions.md` for LLM context
 - See `PROJECT_SUMMARY.md` for architecture details
@@ -288,6 +304,7 @@ Create plugins for any scriptable macOS application!
 **📝 [Complete Plugin Creation Guide](../docs/creating-plugins.md)**
 
 Quick steps:
+
 1. Create `src/plugins/yourapp.plugin/` directory
 2. Add `plugin.ts` and `scripts/` subdirectory
 3. Implement tools that call AppleScript files
@@ -305,6 +322,7 @@ touch src/plugins/mail.plugin/scripts/send_email.applescript
 ```
 
 Edit `plugin.ts`:
+
 ```typescript
 import { AppPlugin, ToolRegistry, z } from 'jsr:@beyondbetter/bb-mcp-server';
 import { findAndExecuteScript } from '../../utils/scriptLoader.ts';
@@ -313,61 +331,62 @@ import { dirname, fromFileUrl } from '@std/path';
 const getPluginDir = () => dirname(fromFileUrl(import.meta.url));
 
 export default {
-  name: 'mail',
-  version: '1.0.0',
-  description: 'Tools for Mail.app',
-  
-  async initialize(dependencies, toolRegistry, workflowRegistry) {
-    const logger = dependencies.logger;
-    const pluginDir = getPluginDir();
-    
-    toolRegistry.registerTool(
-      'send_email',
-      {
-        title: 'Send Email',
-        description: 'Send an email via Mail.app',
-        category: 'Mail',
-        inputSchema: {
-          to: z.string().describe('Recipient email address'),
-          subject: z.string().describe('Email subject'),
-          body: z.string().describe('Email body'),
-          timeout: z.number().optional()
-        }
-      },
-      async (args) => {
-        try {
-          const result = await findAndExecuteScript(
-            pluginDir,
-            'send_email',
-            args,  // Template variables
-            undefined,
-            args.timeout,
-            logger
-          );
-          
-          return {
-            content: [{
-              type: 'text',
-              text: JSON.stringify(result, null, 2)
-            }],
-            isError: !result.success
-          };
-        } catch (error) {
-          return {
-            content: [{
-              type: 'text',
-              text: `Error: ${error.message}`
-            }],
-            isError: true
-          };
-        }
-      }
-    );
-  }
+	name: 'mail',
+	version: '1.0.0',
+	description: 'Tools for Mail.app',
+
+	async initialize(dependencies, toolRegistry, workflowRegistry) {
+		const logger = dependencies.logger;
+		const pluginDir = getPluginDir();
+
+		toolRegistry.registerTool(
+			'send_email',
+			{
+				title: 'Send Email',
+				description: 'Send an email via Mail.app',
+				category: 'Mail',
+				inputSchema: {
+					to: z.string().describe('Recipient email address'),
+					subject: z.string().describe('Email subject'),
+					body: z.string().describe('Email body'),
+					timeout: z.number().optional(),
+				},
+			},
+			async (args) => {
+				try {
+					const result = await findAndExecuteScript(
+						pluginDir,
+						'send_email',
+						args, // Template variables
+						undefined,
+						args.timeout,
+						logger,
+					);
+
+					return {
+						content: [{
+							type: 'text',
+							text: JSON.stringify(result, null, 2),
+						}],
+						isError: !result.success,
+					};
+				} catch (error) {
+					return {
+						content: [{
+							type: 'text',
+							text: `Error: ${error.message}`,
+						}],
+						isError: true,
+					};
+				}
+			},
+		);
+	},
 } as AppPlugin;
 ```
 
 Edit `scripts/send_email.applescript`:
+
 ```applescript
 tell application "Mail"
     set newMessage to make new outgoing message with properties {
@@ -484,7 +503,7 @@ osacompile -o scripts/frequent.scpt scripts/frequent.applescript
 ```javascript
 // DON'T do this:
 for (const file of files) {
-  await setFileLabel([file], labelIndex);
+	await setFileLabel([file], labelIndex);
 }
 
 // DO this instead:
@@ -495,13 +514,19 @@ await setFileLabel(files, labelIndex);
 
 ```javascript
 // Quick operation
-{ timeout: 5000 }  // 5 seconds
+{
+	timeout: 5000;
+} // 5 seconds
 
-// Complex operation  
-{ timeout: 60000 }  // 1 minute
+// Complex operation
+{
+	timeout: 60000;
+} // 1 minute
 
 // Very slow operation
-{ timeout: 120000 }  // 2 minutes (if MAX allows)
+{
+	timeout: 120000;
+} // 2 minutes (if MAX allows)
 ```
 
 ## Getting Help

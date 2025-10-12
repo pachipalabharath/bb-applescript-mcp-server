@@ -3,7 +3,7 @@
  * Verifies that the test framework is working correctly
  */
 
-import { assertEquals, assert } from '@std/assert';
+import { assert, assertEquals } from '@std/assert';
 
 Deno.test('sanity check - basic assertion', () => {
 	assertEquals(1 + 1, 2);

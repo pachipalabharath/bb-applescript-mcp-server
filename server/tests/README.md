@@ -44,6 +44,7 @@ Tests for core utility functions that don't require actual AppleScript execution
 ## Test Coverage
 
 The current test suite focuses on **pure functions** and **configuration logic** that can be tested without:
+
 - Executing actual AppleScript code
 - Requiring macOS-specific APIs
 - Needing external applications (BBEdit, Finder, etc.)
@@ -96,8 +97,8 @@ import { assertEquals, assertThrows } from '@std/assert';
 import { functionToTest } from '../../src/path/to/module.ts';
 
 Deno.test('functionName - description of test case', () => {
-  const result = functionToTest(input);
-  assertEquals(result, expectedOutput);
+	const result = functionToTest(input);
+	assertEquals(result, expectedOutput);
 });
 ```
 
@@ -113,10 +114,10 @@ Deno.test('functionName - description of test case', () => {
    ```typescript
    // Arrange
    const input = 'test';
-   
+
    // Act
    const result = processInput(input);
-   
+
    // Assert
    assertEquals(result, 'expected');
    ```
@@ -125,20 +126,21 @@ Deno.test('functionName - description of test case', () => {
    ```typescript
    const original = Deno.env.get('VAR');
    try {
-     Deno.env.set('VAR', 'test');
-     // ... test code ...
+   	Deno.env.set('VAR', 'test');
+   	// ... test code ...
    } finally {
-     if (original) {
-       Deno.env.set('VAR', original);
-     } else {
-       Deno.env.delete('VAR');
-     }
+   	if (original) {
+   		Deno.env.set('VAR', original);
+   	} else {
+   		Deno.env.delete('VAR');
+   	}
    }
    ```
 
 ## Dependencies
 
 Tests use Deno's standard library:
+
 - `@std/assert` - Assertion functions
 - `@std/path` - Path utilities (when needed)
 
@@ -147,6 +149,7 @@ Tests use Deno's standard library:
 Some tests verify environment variable handling. The test suite cleans up after itself to avoid side effects.
 
 Relevant environment variables:
+
 - `APPLESCRIPT_TIMEOUT_DEFAULT` - Default timeout in milliseconds (default: 30000)
 - `APPLESCRIPT_TIMEOUT_MAX` - Maximum allowed timeout (default: 300000)
 - `DEBUG_APPLESCRIPT` - Enable debug mode (default: false)

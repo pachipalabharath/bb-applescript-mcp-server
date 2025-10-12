@@ -1,6 +1,6 @@
 /**
  * Tool Types for Plugin Development
- * 
+ *
  * Re-exports types from bb-mcp-server for use in plugin tool definitions.
  * Provides a centralized import point for tool-related types.
  */
@@ -8,20 +8,14 @@
 import type { CallToolResult } from 'mcp/types.js';
 import type { ZodSchema } from 'zod';
 import type {
+	ToolCallExtra,
 	ToolDefinition,
 	ToolHandler,
 	ToolRegistrationOptions,
-	ToolCallExtra,
 } from 'jsr:@beyondbetter/bb-mcp-server';
 
 // Re-export for convenience
-export type {
-	CallToolResult,
-	ToolDefinition,
-	ToolHandler,
-	ToolRegistrationOptions,
-	ToolCallExtra,
-};
+export type { CallToolResult, ToolCallExtra, ToolDefinition, ToolHandler, ToolRegistrationOptions };
 
 /**
  * Tool configuration for registration

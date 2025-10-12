@@ -3,7 +3,7 @@
  * Supports both compiled scripts and template-based scripts
  */
 
-import { join, dirname } from '@std/path';
+import { dirname, join } from '@std/path';
 import type { Logger } from 'jsr:@beyondbetter/bb-mcp-server';
 import { renderTemplate } from './templateRenderer.ts';
 import { compileAndRun, runAppleScript } from './scriptRunner.ts';

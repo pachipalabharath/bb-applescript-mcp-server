@@ -5,7 +5,7 @@
 
 import { ensureDir } from 'jsr:@std/fs@^1.0.16';
 import type { Logger } from 'jsr:@beyondbetter/bb-mcp-server';
-import { toError, errorMessage } from 'jsr:@beyondbetter/bb-mcp-server';
+import { errorMessage, toError } from 'jsr:@beyondbetter/bb-mcp-server';
 import {
 	AppleScriptResult,
 	createErrorResult,
@@ -305,7 +305,7 @@ export async function compileAndRun(
 				const executionTime = performance.now() - startTime;
 
 				// Extract error line number if available
-				const lineMatch = stderrText.match(/:([0-9]+):/);  
+				const lineMatch = stderrText.match(/:([0-9]+):/);
 				const errorLine = lineMatch?.[1] ? parseInt(lineMatch[1], 10) : undefined;
 
 				// Build enhanced error message with context

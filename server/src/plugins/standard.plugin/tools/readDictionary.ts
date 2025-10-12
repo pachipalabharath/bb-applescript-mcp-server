@@ -1,6 +1,6 @@
 /**
  * Read AppleScript Dictionary Tool
- * 
+ *
  * Reads and parses AppleScript dictionaries for applications.
  * Supports multiple output modes and formats.
  */
@@ -8,7 +8,7 @@
 import { z } from 'zod';
 import { runAppleScript } from '../../../utils/scriptRunner.ts';
 import { createErrorResult } from '../../../utils/errorHandler.ts';
-import { parseSdefOverview, parseSdefQuery, parseSdefFull, extractSdefQueryXml } from '../../../utils/sdefParser.ts';
+import { extractSdefQueryXml, parseSdefFull, parseSdefOverview, parseSdefQuery } from '../../../utils/sdefParser.ts';
 import type { ToolConfig, ToolDependencies } from '../../../types/toolTypes.ts';
 
 export function getTools(dependencies: ToolDependencies): ToolConfig<any>[] {
@@ -119,7 +119,7 @@ export function getTools(dependencies: ToolDependencies): ToolConfig<any>[] {
 						const latinOutput = new TextDecoder('latin1').decode(stdout);
 						const encodingMatch = latinOutput.match(/<\?xml[^>]*encoding="([^"]+)"/i);
 						const encoding = encodingMatch ? encodingMatch[1] : 'macintosh';
-						
+
 						// Decode with detected encoding (sdef typically uses Mac Roman/macintosh)
 						const sdefOutput = new TextDecoder(encoding).decode(stdout);
 
@@ -161,7 +161,9 @@ export function getTools(dependencies: ToolDependencies): ToolConfig<any>[] {
 									logger.error('Failed to parse sdef XML:', parseError);
 									const result = createErrorResult(
 										'execution',
-										`Failed to parse dictionary XML: ${parseError instanceof Error ? parseError.message : 'Unknown error'}`,
+										`Failed to parse dictionary XML: ${
+											parseError instanceof Error ? parseError.message : 'Unknown error'
+										}`,
 										0,
 										undefined,
 										0,
@@ -187,7 +189,9 @@ export function getTools(dependencies: ToolDependencies): ToolConfig<any>[] {
 								logger.error('Failed to parse sdef XML:', parseError);
 								const result = createErrorResult(
 									'execution',
-									`Failed to parse dictionary XML: ${parseError instanceof Error ? parseError.message : 'Unknown error'}`,
+									`Failed to parse dictionary XML: ${
+										parseError instanceof Error ? parseError.message : 'Unknown error'
+									}`,
 									0,
 									undefined,
 									0,
@@ -237,7 +241,9 @@ export function getTools(dependencies: ToolDependencies): ToolConfig<any>[] {
 								logger.error('Failed to parse sdef XML:', parseError);
 								const result = createErrorResult(
 									'execution',
-									`Failed to parse dictionary XML: ${parseError instanceof Error ? parseError.message : 'Unknown error'}`,
+									`Failed to parse dictionary XML: ${
+										parseError instanceof Error ? parseError.message : 'Unknown error'
+									}`,
 									0,
 									undefined,
 									0,
@@ -267,7 +273,7 @@ export function getTools(dependencies: ToolDependencies): ToolConfig<any>[] {
 						};
 					} catch (error) {
 						clearTimeout(timeoutId);
-						
+
 						// Check if it was a timeout
 						if (error instanceof Error && error.name === 'AbortError') {
 							const result = createErrorResult(

@@ -6,10 +6,10 @@
 import { assertEquals, assertThrows } from '@std/assert';
 import {
 	escapeAppleScriptString,
+	renderTemplate,
+	script,
 	toAppleScriptList,
 	toAppleScriptRecord,
-	script,
-	renderTemplate,
 } from '../../src/utils/templateRenderer.ts';
 
 Deno.test('escapeAppleScriptString - basic string', () => {

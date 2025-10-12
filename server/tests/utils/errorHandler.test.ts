@@ -5,11 +5,11 @@
 
 import { assertEquals } from '@std/assert';
 import {
-	parseAppleScriptError,
-	extractErrorMessage,
-	generateErrorHint,
 	createErrorResult,
 	createSuccessResult,
+	extractErrorMessage,
+	generateErrorHint,
+	parseAppleScriptError,
 } from '../../src/utils/errorHandler.ts';
 
 Deno.test('parseAppleScriptError - permission error (not authorized)', () => {
@@ -42,14 +42,14 @@ Deno.test('parseAppleScriptError - syntax error', () => {
 	assertEquals(result, 'script_error');
 });
 
-Deno.test('parseAppleScriptError - execution error (can\'t get)', () => {
+Deno.test("parseAppleScriptError - execution error (can't get)", () => {
 	const stderr = 'Error: Can\'t get window 1 of application "BBEdit"';
 	const result = parseAppleScriptError(stderr);
 	assertEquals(result, 'script_error');
 });
 
-Deno.test('parseAppleScriptError - execution error (can\'t make)', () => {
-	const stderr = 'Error: Can\'t make some data into expected type';
+Deno.test("parseAppleScriptError - execution error (can't make)", () => {
+	const stderr = "Error: Can't make some data into expected type";
 	const result = parseAppleScriptError(stderr);
 	assertEquals(result, 'script_error');
 });
@@ -102,9 +102,9 @@ Deno.test('generateErrorHint - syntax error', () => {
 	assertEquals(hint.includes('AppleScript syntax'), true);
 });
 
-Deno.test('generateErrorHint - can\'t get error', () => {
-	const hint = generateErrorHint('script_error', 'can\'t get window');
-	assertEquals(hint.includes('doesn\'t exist'), true);
+Deno.test("generateErrorHint - can't get error", () => {
+	const hint = generateErrorHint('script_error', "can't get window");
+	assertEquals(hint.includes("doesn't exist"), true);
 });
 
 Deno.test('generateErrorHint - disabled error', () => {

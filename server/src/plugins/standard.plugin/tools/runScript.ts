@@ -1,6 +1,6 @@
 /**
  * Run Script Tool
- * 
+ *
  * Executes arbitrary AppleScript code.
  * Can be enabled/disabled via ENABLE_ARBITRARY_SCRIPTS environment variable.
  */

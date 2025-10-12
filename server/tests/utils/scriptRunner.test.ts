@@ -4,12 +4,7 @@
  */
 
 import { assertEquals } from '@std/assert';
-import {
-	getDefaultTimeout,
-	getMaxTimeout,
-	validateTimeout,
-	getDebugConfig,
-} from '../../src/utils/scriptRunner.ts';
+import { getDebugConfig, getDefaultTimeout, getMaxTimeout, validateTimeout } from '../../src/utils/scriptRunner.ts';
 
 Deno.test('getDefaultTimeout - uses environment variable', () => {
 	// Save original value
