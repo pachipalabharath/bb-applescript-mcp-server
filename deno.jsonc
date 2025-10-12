@@ -57,5 +57,10 @@
   "lint": {
     "include": ["server", "tests/"],
     "exclude": ["coverage/"]
+  },
+  "publish": {
+    "exclude": [
+      "!server/src/plugins/**/scripts/index.ts"
+    ]
   }
 }
