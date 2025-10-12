@@ -5,17 +5,11 @@
  */
 
 import { AppPlugin, ToolRegistration, ToolRegistry, WorkflowBase, WorkflowRegistry } from '@beyondbetter/bb-mcp-server';
-import { dirname, fromFileUrl } from '@std/path';
 import { getTools as getRunScriptTools } from './tools/runScript.ts';
 import { getTools as getReadDictionaryTools } from './tools/readDictionary.ts';
 import { getTools as getCheckPermissionsTools } from './tools/checkPermissions.ts';
 import { getTools as getFinderTools } from './tools/finderTools.ts';
-
-// Get the plugin directory path
-const getPluginDir = (): string => {
-  const currentFileUrl = import.meta.url;
-  return dirname(fromFileUrl(currentFileUrl));
-};
+import { getPluginDir } from '../../utils/pluginUtils.ts';
 
 export default {
   name: 'standard-tools',
@@ -34,6 +28,7 @@ export default {
     const pluginDir = getPluginDir();
 
     // Collect all tools from the tool modules
+    // scriptLoader.ts will automatically detect and use inlined scripts (JSR) or files (local)
     const allTools = [
       ...getRunScriptTools(dependencies),
       ...getReadDictionaryTools(dependencies),

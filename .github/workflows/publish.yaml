@@ -46,5 +46,8 @@ jobs:
         with:
           deno-version: v2.x
 
+      - name: Build for JSR (inline AppleScript files)
+        run: deno task build:jsr
+
       - name: Publish package
         run: npx jsr publish

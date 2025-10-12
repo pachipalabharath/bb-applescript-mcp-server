@@ -115,7 +115,7 @@ export async function cleanupDebugFiles(options: CleanupOptions): Promise<Cleanu
  */
 if (import.meta.main) {
   const args = Deno.args;
-  const debugDir = args[0] || './debug/applescript';
+  const debugDir = args[0] || './server/debug/applescript';
   const maxAgeDays = args[1] ? parseInt(args[1], 10) : 7;
   const execute = args.includes('--execute');
 
