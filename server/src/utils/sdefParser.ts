@@ -2,7 +2,7 @@
  * Utilities for parsing Apple sdef (scripting definition) XML
  */
 
-import { DOMParser, XMLSerializer } from 'npm:@xmldom/xmldom';
+import { DOMParser, XMLSerializer } from 'npm:@xmldom/xmldom@^0.8.11';
 
 /**
  * Helper to get direct child elements with a specific tag name
