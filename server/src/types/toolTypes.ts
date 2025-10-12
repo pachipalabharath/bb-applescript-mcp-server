@@ -17,7 +17,7 @@ export type { CallToolResult, ToolCallExtra, ToolDefinition, ToolHandler, ToolRe
  * Utility type for getting properly typed args from inputSchema
  */
 export type InferZodSchema<T extends Record<string, ZodSchema>> = {
-	[K in keyof T]: T[K] extends ZodSchema<infer U> ? U : never;
+  [K in keyof T]: T[K] extends ZodSchema<infer U> ? U : never;
 };
 
 /**
@@ -25,19 +25,19 @@ export type InferZodSchema<T extends Record<string, ZodSchema>> = {
  * Matches the parameters expected by ToolRegistry.registerTool
  */
 export interface ToolConfig<T extends Record<string, ZodSchema>> {
-	name: string;
-	definition: ToolDefinition<T>;
-	handler: ToolHandler<T>;
-	options?: ToolRegistrationOptions;
+  name: string;
+  definition: ToolDefinition<T>;
+  handler: ToolHandler<T>;
+  options?: ToolRegistrationOptions;
 }
 
 /**
  * Dependencies passed to tool files from plugin initialization
  */
 export interface ToolDependencies {
-	logger: any;
-	configManager?: any;
-	auditLogger?: any;
-	errorHandler?: any;
-	[key: string]: any;
+  logger: any;
+  configManager?: any;
+  auditLogger?: any;
+  errorHandler?: any;
+  [key: string]: any;
 }

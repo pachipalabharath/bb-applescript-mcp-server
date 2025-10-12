@@ -54,17 +54,17 @@ Edit `~/Library/Application Support/Claude/claude_desktop_config.json`:
 
 ```json
 {
-	"mcpServers": {
-		"applescript": {
-			"command": "deno",
-			"args": [
-				"run",
-				"--allow-all",
-				"--unstable-kv",
-				"jsr:@beyondbetter/bb-applescript-mcp-server"
-			]
-		}
-	}
+  "mcpServers": {
+    "applescript": {
+      "command": "deno",
+      "args": [
+        "run",
+        "--allow-all",
+        "--unstable-kv",
+        "jsr:@beyondbetter/bb-applescript-mcp-server"
+      ]
+    }
+  }
 }
 ```
 
@@ -123,22 +123,22 @@ The JSR version runs with safe defaults, but you can customize using environment
 
 ```json
 {
-	"mcpServers": {
-		"applescript": {
-			"command": "deno",
-			"args": [
-				"run",
-				"--allow-all",
-				"--unstable-kv",
-				"jsr:@beyondbetter/bb-applescript-mcp-server"
-			],
-			"env": {
-				"LOG_LEVEL": "debug",
-				"ENABLE_ARBITRARY_SCRIPTS": "false",
-				"PLUGINS_BLOCKED_LIST": "experimental"
-			}
-		}
-	}
+  "mcpServers": {
+    "applescript": {
+      "command": "deno",
+      "args": [
+        "run",
+        "--allow-all",
+        "--unstable-kv",
+        "jsr:@beyondbetter/bb-applescript-mcp-server"
+      ],
+      "env": {
+        "LOG_LEVEL": "debug",
+        "ENABLE_ARBITRARY_SCRIPTS": "false",
+        "PLUGINS_BLOCKED_LIST": "experimental"
+      }
+    }
+  }
 }
 ```
 
@@ -196,17 +196,17 @@ Add to BB Settings or Project Settings → MCP Servers:
 
 ```json
 {
-	"mcpServers": {
-		"applescript": {
-			"command": "deno",
-			"args": [
-				"run",
-				"--allow-all",
-				"--unstable-kv",
-				"/FULL/PATH/TO/bb-mcp-applescript/server/main.ts"
-			]
-		}
-	}
+  "mcpServers": {
+    "applescript": {
+      "command": "deno",
+      "args": [
+        "run",
+        "--allow-all",
+        "--unstable-kv",
+        "/FULL/PATH/TO/bb-mcp-applescript/server/main.ts"
+      ]
+    }
+  }
 }
 ```
 
@@ -331,57 +331,57 @@ import { dirname, fromFileUrl } from '@std/path';
 const getPluginDir = () => dirname(fromFileUrl(import.meta.url));
 
 export default {
-	name: 'mail',
-	version: '1.0.0',
-	description: 'Tools for Mail.app',
+  name: 'mail',
+  version: '1.0.0',
+  description: 'Tools for Mail.app',
 
-	async initialize(dependencies, toolRegistry, workflowRegistry) {
-		const logger = dependencies.logger;
-		const pluginDir = getPluginDir();
+  async initialize(dependencies, toolRegistry, workflowRegistry) {
+    const logger = dependencies.logger;
+    const pluginDir = getPluginDir();
 
-		toolRegistry.registerTool(
-			'send_email',
-			{
-				title: 'Send Email',
-				description: 'Send an email via Mail.app',
-				category: 'Mail',
-				inputSchema: {
-					to: z.string().describe('Recipient email address'),
-					subject: z.string().describe('Email subject'),
-					body: z.string().describe('Email body'),
-					timeout: z.number().optional(),
-				},
-			},
-			async (args) => {
-				try {
-					const result = await findAndExecuteScript(
-						pluginDir,
-						'send_email',
-						args, // Template variables
-						undefined,
-						args.timeout,
-						logger,
-					);
+    toolRegistry.registerTool(
+      'send_email',
+      {
+        title: 'Send Email',
+        description: 'Send an email via Mail.app',
+        category: 'Mail',
+        inputSchema: {
+          to: z.string().describe('Recipient email address'),
+          subject: z.string().describe('Email subject'),
+          body: z.string().describe('Email body'),
+          timeout: z.number().optional(),
+        },
+      },
+      async (args) => {
+        try {
+          const result = await findAndExecuteScript(
+            pluginDir,
+            'send_email',
+            args, // Template variables
+            undefined,
+            args.timeout,
+            logger,
+          );
 
-					return {
-						content: [{
-							type: 'text',
-							text: JSON.stringify(result, null, 2),
-						}],
-						isError: !result.success,
-					};
-				} catch (error) {
-					return {
-						content: [{
-							type: 'text',
-							text: `Error: ${error.message}`,
-						}],
-						isError: true,
-					};
-				}
-			},
-		);
-	},
+          return {
+            content: [{
+              type: 'text',
+              text: JSON.stringify(result, null, 2),
+            }],
+            isError: !result.success,
+          };
+        } catch (error) {
+          return {
+            content: [{
+              type: 'text',
+              text: `Error: ${error.message}`,
+            }],
+            isError: true,
+          };
+        }
+      },
+    );
+  },
 } as AppPlugin;
 ```
 
@@ -503,7 +503,7 @@ osacompile -o scripts/frequent.scpt scripts/frequent.applescript
 ```javascript
 // DON'T do this:
 for (const file of files) {
-	await setFileLabel([file], labelIndex);
+  await setFileLabel([file], labelIndex);
 }
 
 // DO this instead:
@@ -515,17 +515,17 @@ await setFileLabel(files, labelIndex);
 ```javascript
 // Quick operation
 {
-	timeout: 5000;
+  timeout: 5000;
 } // 5 seconds
 
 // Complex operation
 {
-	timeout: 60000;
+  timeout: 60000;
 } // 1 minute
 
 // Very slow operation
 {
-	timeout: 120000;
+  timeout: 120000;
 } // 2 minutes (if MAX allows)
 ```
 

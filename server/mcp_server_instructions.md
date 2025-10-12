@@ -27,8 +27,8 @@ Execute arbitrary AppleScript code. This is a powerful tool that allows writing 
 
 ```json
 {
-	"script": "tell application \"Finder\" to get name of startup disk",
-	"timeout": 5000
+  "script": "tell application \"Finder\" to get name of startup disk",
+  "timeout": 5000
 }
 ```
 
@@ -64,8 +64,8 @@ Read the AppleScript dictionary for any application to understand its scriptable
 
 ```json
 {
-	"application": "BBEdit",
-	"mode": "overview"
+  "application": "BBEdit",
+  "mode": "overview"
 }
 ```
 
@@ -73,15 +73,15 @@ Returns structured summary organized by suites with counts:
 
 ```json
 {
-	"application": "BBEdit",
-	"suites": [
-		{
-			"name": "Standard Suite",
-			"classes": [{ "name": "document", "properties_count": 10, "elements_count": 2 }],
-			"commands": [{ "name": "open", "parameters_count": 3 }],
-			"enumerations": [{ "name": "save_options", "values": ["yes", "no", "ask"] }]
-		}
-	]
+  "application": "BBEdit",
+  "suites": [
+    {
+      "name": "Standard Suite",
+      "classes": [{ "name": "document", "properties_count": 10, "elements_count": 2 }],
+      "commands": [{ "name": "open", "parameters_count": 3 }],
+      "enumerations": [{ "name": "save_options", "values": ["yes", "no", "ask"] }]
+    }
+  ]
 }
 ```
 
@@ -89,10 +89,10 @@ Returns structured summary organized by suites with counts:
 
 ```json
 {
-	"application": "BBEdit",
-	"mode": "query",
-	"query": ["class:document", "command:make"],
-	"outputFormat": "json"
+  "application": "BBEdit",
+  "mode": "query",
+  "query": ["class:document", "command:make"],
+  "outputFormat": "json"
 }
 ```
 
@@ -102,9 +102,9 @@ Returns complete details for specified items including all parameters, propertie
 
 ```json
 {
-	"application": "Finder",
-	"mode": "full",
-	"outputFormat": "json"
+  "application": "Finder",
+  "mode": "full",
+  "outputFormat": "json"
 }
 ```
 
@@ -140,20 +140,20 @@ Check if automation permissions are granted for specified applications.
 
 ```json
 {
-	"hasPermissions": true,
-	"applications": [
-		{
-			"name": "BBEdit",
-			"hasPermission": true,
-			"status": "authorized"
-		},
-		{
-			"name": "Finder",
-			"hasPermission": false,
-			"status": "denied",
-			"instructions": "Grant permission in System Settings > Privacy & Security > Automation"
-		}
-	]
+  "hasPermissions": true,
+  "applications": [
+    {
+      "name": "BBEdit",
+      "hasPermission": true,
+      "status": "authorized"
+    },
+    {
+      "name": "Finder",
+      "hasPermission": false,
+      "status": "denied",
+      "instructions": "Grant permission in System Settings > Privacy & Security > Automation"
+    }
+  ]
 }
 ```
 
@@ -191,8 +191,8 @@ Set the Finder label color for one or more files or folders.
 
 ```json
 {
-	"paths": ["/Users/username/Documents/report.pdf"],
-	"labelIndex": 4
+  "paths": ["/Users/username/Documents/report.pdf"],
+  "labelIndex": 4
 }
 ```
 
@@ -249,15 +249,15 @@ Get the currently selected items in Finder.
 
 ```json
 {
-	"count": 2,
-	"items": [
-		{
-			"path": "/Users/username/file1.txt",
-			"name": "file1.txt",
-			"kind": "Plain Text File",
-			"isFolder": false
-		}
-	]
+  "count": 2,
+  "items": [
+    {
+      "path": "/Users/username/file1.txt",
+      "name": "file1.txt",
+      "kind": "Plain Text File",
+      "isFolder": false
+    }
+  ]
 }
 ```
 
@@ -287,14 +287,14 @@ Create a new BBEdit notebook with optional initial content.
 
 ```json
 {
-	"name": "Project Notes",
-	"content": [
-		{
-			"type": "text",
-			"data": "Meeting notes from today..."
-		}
-	],
-	"open": true
+  "name": "Project Notes",
+  "content": [
+    {
+      "type": "text",
+      "data": "Meeting notes from today..."
+    }
+  ],
+  "open": true
 }
 ```
 
@@ -321,13 +321,13 @@ Create a new BBEdit project with optional files and folders.
 
 ```json
 {
-	"name": "Website Project",
-	"location": "/Users/username/Projects/",
-	"items": [
-		"/Users/username/Projects/website/src",
-		"/Users/username/Projects/website/docs"
-	],
-	"open": true
+  "name": "Website Project",
+  "location": "/Users/username/Projects/",
+  "items": [
+    "/Users/username/Projects/website/src",
+    "/Users/username/Projects/website/docs"
+  ],
+  "open": true
 }
 ```
 
@@ -349,19 +349,19 @@ All tools return consistent error structures:
 
 ```json
 {
-	"success": false,
-	"error": {
-		"type": "permission|timeout|script_error|system_error|disabled",
-		"message": "Human-readable error message",
-		"code": "ERR_CODE",
-		"hint": "LLM-friendly suggestion for resolution",
-		"details": "Additional technical details"
-	},
-	"metadata": {
-		"executionTime": 123,
-		"scriptPath": "/path/to/script",
-		"timeoutUsed": 30000
-	}
+  "success": false,
+  "error": {
+    "type": "permission|timeout|script_error|system_error|disabled",
+    "message": "Human-readable error message",
+    "code": "ERR_CODE",
+    "hint": "LLM-friendly suggestion for resolution",
+    "details": "Additional technical details"
+  },
+  "metadata": {
+    "executionTime": 123,
+    "scriptPath": "/path/to/script",
+    "timeoutUsed": 30000
+  }
 }
 ```
 
@@ -430,7 +430,11 @@ Plugins can be controlled via environment variables:
 
 3. Create the project with files:
    ```json
-   { "tool": "create_bbedit_project", "name": "My Project", "items": ["/path/to/src", "/path/to/docs"] }
+   {
+     "tool": "create_bbedit_project",
+     "name": "My Project",
+     "items": ["/path/to/src", "/path/to/docs"]
+   }
    ```
 
 ### Workflow 2: Organizing Files with Labels
@@ -466,9 +470,9 @@ Only available when `ENABLE_ARBITRARY_SCRIPTS=true`:
 
    ```json
    {
-   	"tool": "run_script",
-   	"script": "tell application \"ApplicationName\"\n  -- your script here\nend tell",
-   	"timeout": 60000
+     "tool": "run_script",
+     "script": "tell application \"ApplicationName\"\n  -- your script here\nend tell",
+     "timeout": 60000
    }
    ```
 
