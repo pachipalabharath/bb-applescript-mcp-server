@@ -6,7 +6,7 @@
 import { AppPlugin, ToolRegistration, ToolRegistry, WorkflowBase, WorkflowRegistry } from '@beyondbetter/bb-mcp-server';
 import { z } from 'zod';
 import { findAndExecuteScript } from '../../utils/scriptLoader.ts';
-import { getPluginDir, expandHomePath } from '../../utils/pluginUtils.ts';
+import { expandHomePath, getPluginDir } from '../../utils/pluginUtils.ts';
 
 // Input schemas
 const createBbeditNotebookInputSchema = {
