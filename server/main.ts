@@ -1,6 +1,6 @@
 #!/usr/bin/env -S deno run --allow-all --unstable-kv
 
-import { AppServer } from 'jsr:@beyondbetter/bb-mcp-server';
+import { AppServer } from '@beyondbetter/bb-mcp-server';
 
 const appServer = await AppServer.create({
 	serverConfig: {

@@ -7,12 +7,7 @@
 
 import type { CallToolResult } from 'mcp/types.js';
 import type { ZodSchema } from 'zod';
-import type {
-	ToolCallExtra,
-	ToolDefinition,
-	ToolHandler,
-	ToolRegistrationOptions,
-} from 'jsr:@beyondbetter/bb-mcp-server';
+import type { ToolCallExtra, ToolDefinition, ToolHandler, ToolRegistrationOptions } from '@beyondbetter/bb-mcp-server';
 
 // Re-export for convenience
 export type { CallToolResult, ToolCallExtra, ToolDefinition, ToolHandler, ToolRegistrationOptions };
