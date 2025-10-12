@@ -4,24 +4,9 @@
  */
 
 import { AppPlugin, ToolRegistration, ToolRegistry, WorkflowBase, WorkflowRegistry } from '@beyondbetter/bb-mcp-server';
-import { dirname, fromFileUrl } from '@std/path';
 import { z } from 'zod';
 import { findAndExecuteScript } from '../../utils/scriptLoader.ts';
-
-// Get the plugin directory path
-const getPluginDir = (): string => {
-  const currentFileUrl = import.meta.url;
-  return dirname(fromFileUrl(currentFileUrl));
-};
-
-// Expand ~ to home directory in paths
-const expandHomePath = (path: string): string => {
-  if (path.startsWith('~/')) {
-    const home = Deno.env.get('HOME') || Deno.env.get('USERPROFILE') || '';
-    return path.replace(/^~/, home);
-  }
-  return path;
-};
+import { expandHomePath, getPluginDir } from '../../utils/pluginUtils.ts';
 
 // Input schemas
 const createBbeditNotebookInputSchema = {
@@ -114,7 +99,7 @@ export default {
     workflowRegistry: WorkflowRegistry,
   ): Promise<void> {
     const logger = dependencies.logger;
-    const pluginDir = getPluginDir();
+    const pluginDir = getPluginDir(import.meta.url);
 
     // Register create_notebook tool
     toolRegistry.registerTool(

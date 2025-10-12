@@ -18,3 +18,6 @@ debug/
 dev-planning/
 docs/.obsidian
 playground/
+
+# Generated files for JSR (created by build:jsr task)
+server/src/plugins/**/scripts/index.ts
