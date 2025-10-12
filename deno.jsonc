@@ -25,7 +25,7 @@
     "tool:format": "deno fmt ./server/ ./server/tests/"
   },
   "imports": {
-    "@beyondbetter/bb-mcp-server": "jsr:@beyondbetter/bb-mcp-server@^0.1.10",
+    "@beyondbetter/bb-mcp-server": "jsr:@beyondbetter/bb-mcp-server@^0.1.14",
     "@std/assert": "jsr:@std/assert@^1.0.0",
     "@std/path": "jsr:@std/path@^1.0.0",
 	"mcp": "npm:@modelcontextprotocol/sdk@1.18.2",
