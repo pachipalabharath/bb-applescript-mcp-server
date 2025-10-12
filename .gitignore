@@ -5,6 +5,9 @@
 .trash/
 .uploads/
 
+# Environment files
+.env
+
 node_modules/
 coverage/
 tags

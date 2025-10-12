@@ -4,13 +4,7 @@
  * and Finder operations that don't have simple CLI equivalents
  */
 
-import {
-  AppPlugin,
-  ToolRegistration,
-  ToolRegistry,
-  WorkflowBase,
-  WorkflowRegistry,
-} from 'jsr:@beyondbetter/bb-mcp-server';
+import { AppPlugin, ToolRegistration, ToolRegistry, WorkflowBase, WorkflowRegistry } from '@beyondbetter/bb-mcp-server';
 import { dirname, fromFileUrl } from '@std/path';
 import { getTools as getRunScriptTools } from './tools/runScript.ts';
 import { getTools as getReadDictionaryTools } from './tools/readDictionary.ts';
