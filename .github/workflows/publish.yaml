@@ -50,4 +50,4 @@ jobs:
         run: deno task build:jsr
 
       - name: Publish package
-        run: npx jsr publish
+        run: npx jsr publish --allow-dirty
