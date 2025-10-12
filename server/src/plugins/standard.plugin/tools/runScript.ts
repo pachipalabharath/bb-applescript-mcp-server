@@ -48,7 +48,7 @@ export function getTools(dependencies: ToolDependencies): ToolConfig<any>[] {
 						const result = await runAppleScript({
 							script: args.script,
 							inline: true,
-							timeout: args.timeout,
+							timeout: args.timeout ?? 30000,
 							logger,
 						});
 

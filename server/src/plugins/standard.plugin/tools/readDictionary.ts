@@ -57,7 +57,7 @@ export function getTools(dependencies: ToolDependencies): ToolConfig<any>[] {
 				category: 'AppleScript',
 				inputSchema: readDictionaryInputSchema,
 			},
-			handler: async (args: ReadDictionaryArgs) => {
+			handler: (async (args: ReadDictionaryArgs) => {
 				try {
 					logger.info(`Reading dictionary for ${args.application}`);
 
@@ -328,7 +328,7 @@ export function getTools(dependencies: ToolDependencies): ToolConfig<any>[] {
 						isError: true,
 					};
 				}
-			},
+			}) as any,
 		},
 	];
 }
