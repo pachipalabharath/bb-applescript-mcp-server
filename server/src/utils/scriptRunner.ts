@@ -4,8 +4,8 @@
  */
 
 import { ensureDir } from 'jsr:@std/fs@^1.0.16';
-import type { Logger } from 'jsr:@beyondbetter/bb-mcp-server';
-import { errorMessage, toError } from 'jsr:@beyondbetter/bb-mcp-server';
+import type { Logger } from '@beyondbetter/bb-mcp-server';
+import { errorMessage, toError } from '@beyondbetter/bb-mcp-server';
 import {
 	AppleScriptResult,
 	createErrorResult,

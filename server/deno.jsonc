@@ -6,7 +6,7 @@
 	"license": "MIT",
 	"copyright": "2025 - Beyond Better <charlie@beyondbetter.app>",
 	"imports": {
-		"@beyondbetter/bb-mcp-server": "jsr:@beyondbetter/bb-mcp-server@^0.1.0",
+		"@beyondbetter/bb-mcp-server": "jsr:@beyondbetter/bb-mcp-server@^0.1.10",
 		"@std/assert": "jsr:@std/assert@^1.0.0",
 		"@std/path": "jsr:@std/path@^1.0.0",
 		"zod": "npm:zod@^3.22.4"

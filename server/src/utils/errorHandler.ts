@@ -2,8 +2,8 @@
  * Standardized error handling for AppleScript execution
  */
 
-import type { Logger } from 'jsr:@beyondbetter/bb-mcp-server';
-import { toError } from 'jsr:@beyondbetter/bb-mcp-server';
+import type { Logger } from '@beyondbetter/bb-mcp-server';
+import { toError } from '@beyondbetter/bb-mcp-server';
 
 export type ErrorType = 'permission' | 'timeout' | 'script_error' | 'system_error' | 'disabled';
 

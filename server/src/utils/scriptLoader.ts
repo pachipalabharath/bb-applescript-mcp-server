@@ -4,7 +4,7 @@
  */
 
 import { dirname, join } from '@std/path';
-import type { Logger } from 'jsr:@beyondbetter/bb-mcp-server';
+import type { Logger } from '@beyondbetter/bb-mcp-server';
 import { renderTemplate } from './templateRenderer.ts';
 import { compileAndRun, runAppleScript } from './scriptRunner.ts';
 import type { AppleScriptResult } from './errorHandler.ts';
