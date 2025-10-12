@@ -3,13 +3,13 @@
  * Verifies runtime detection and plugin loading strategy
  */
 
-import { assertEquals, assert } from '@std/assert';
-import { isRunningFromJsr, getStaticPlugins } from '../src/dependencyHelper.ts';
+import { assert, assertEquals } from '@std/assert';
+import { getStaticPlugins, isRunningFromJsr } from '../src/dependencyHelper.ts';
 
 Deno.test('isRunningFromJsr - detects local file URLs', () => {
 	// When running tests locally, import.meta.url should start with file://
 	const result = isRunningFromJsr();
-	
+
 	// In test environment, we're running from local files
 	assertEquals(
 		result,
@@ -20,13 +20,13 @@ Deno.test('isRunningFromJsr - detects local file URLs', () => {
 
 Deno.test('getStaticPlugins - returns array of plugins', () => {
 	const plugins = getStaticPlugins();
-	
+
 	// Should return an array
 	assert(Array.isArray(plugins), 'Should return an array');
-	
+
 	// Should have at least standard and bbedit plugins
 	assert(plugins.length >= 2, 'Should have at least 2 plugins');
-	
+
 	// Verify plugin structure
 	for (const plugin of plugins) {
 		assert(plugin.name, 'Plugin should have a name');
@@ -35,7 +35,7 @@ Deno.test('getStaticPlugins - returns array of plugins', () => {
 		assert(Array.isArray(plugin.workflows), 'Plugin should have workflows array');
 		assert(Array.isArray(plugin.tools), 'Plugin should have tools array');
 	}
-	
+
 	// Verify we have the expected plugins
 	const pluginNames = plugins.map((p) => p.name);
 	assert(
@@ -50,7 +50,7 @@ Deno.test('getStaticPlugins - returns array of plugins', () => {
 
 Deno.test('getStaticPlugins - plugins have initialize method', () => {
 	const plugins = getStaticPlugins();
-	
+
 	for (const plugin of plugins) {
 		assert(
 			typeof plugin.initialize === 'function',
@@ -67,22 +67,22 @@ Deno.test('URL detection logic - JSR patterns', () => {
 		'https://esm.sh/jsr/@beyondbetter/bb-applescript-mcp-server@0.1.0/server/main.ts',
 		'https://cdn.jsdelivr.net/jsr/@beyondbetter/bb-applescript-mcp-server/server/main.ts',
 	];
-	
+
 	for (const url of jsrPatterns) {
-		const isJsr = url.startsWith('https://jsr.io/') || 
-		             url.startsWith('https://esm.sh/jsr/') ||
-		             !url.startsWith('file://');
+		const isJsr = url.startsWith('https://jsr.io/') ||
+			url.startsWith('https://esm.sh/jsr/') ||
+			!url.startsWith('file://');
 		assert(
 			isJsr,
 			`Should detect ${url} as JSR URL`,
 		);
 	}
-	
+
 	const localPatterns = [
 		'file:///Users/username/projects/bb-mcp-applescript/server/main.ts',
 		'file:///C:/Projects/bb-mcp-applescript/server/main.ts',
 	];
-	
+
 	for (const url of localPatterns) {
 		const isLocal = url.startsWith('file://');
 		assert(
