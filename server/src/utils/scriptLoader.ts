@@ -3,8 +3,9 @@
  * Supports both compiled scripts and template-based scripts
  */
 
-import { dirname, join } from '@std/path';
+import { join } from '@std/path';
 import type { Logger } from '@beyondbetter/bb-mcp-server';
+import { toError } from '@beyondbetter/bb-mcp-server';
 import { renderTemplate } from './templateRenderer.ts';
 import { compileAndRun, runAppleScript } from './scriptRunner.ts';
 import type { AppleScriptResult } from './errorHandler.ts';
@@ -59,7 +60,7 @@ export async function loadScript(scriptPath: string, logger?: Logger): Promise<L
 			};
 		}
 	} catch (error) {
-		logger?.error(`Failed to load script: ${scriptPath}`, { error });
+		logger?.error(`Failed to load script: ${scriptPath}`, toError(error), { error });
 		throw new Error(
 			`Failed to load script ${scriptPath}: ${error instanceof Error ? error.message : 'Unknown error'}`,
 		);
@@ -113,12 +114,11 @@ export async function executeScript(
 ): Promise<AppleScriptResult> {
 	if (script.compiled) {
 		// Run compiled script directly with args
-		return runAppleScript({
-			script: script.path,
-			args,
-			timeout,
-			logger,
-		});
+		const options: any = { script: script.path };
+		if (args !== undefined) options.args = args;
+		if (timeout !== undefined) options.timeout = timeout;
+		if (logger !== undefined) options.logger = logger;
+		return runAppleScript(options);
 	} else if (script.hasTemplates && script.content) {
 		// Render template and compile/run
 		if (!variables) {
@@ -134,12 +134,11 @@ export async function executeScript(
 		return compileAndRun(rendered, timeout, logger);
 	} else {
 		// Run source script directly
-		return runAppleScript({
-			script: script.path,
-			args,
-			timeout,
-			logger,
-		});
+		const options: any = { script: script.path };
+		if (args !== undefined) options.args = args;
+		if (timeout !== undefined) options.timeout = timeout;
+		if (logger !== undefined) options.logger = logger;
+		return runAppleScript(options);
 	}
 }
 

@@ -13,6 +13,14 @@ import type { ToolCallExtra, ToolDefinition, ToolHandler, ToolRegistrationOption
 export type { CallToolResult, ToolCallExtra, ToolDefinition, ToolHandler, ToolRegistrationOptions };
 
 /**
+ * Extract inferred types from Zod schema record
+ * Utility type for getting properly typed args from inputSchema
+ */
+export type InferZodSchema<T extends Record<string, ZodSchema>> = {
+	[K in keyof T]: T[K] extends ZodSchema<infer U> ? U : never;
+};
+
+/**
  * Tool configuration for registration
  * Matches the parameters expected by ToolRegistry.registerTool
  */

@@ -10,6 +10,18 @@ import { runAppleScript } from '../../../utils/scriptRunner.ts';
 import { createErrorResult } from '../../../utils/errorHandler.ts';
 import type { ToolConfig, ToolDependencies } from '../../../types/toolTypes.ts';
 
+// Input schema
+const runScriptInputSchema = {
+	script: z.string().describe('The AppleScript code to execute'),
+	timeout: z.number().optional().describe('Timeout in milliseconds (default: 30000, max: configured max)'),
+} as const;
+
+// Type definition
+type RunScriptArgs = {
+	script: string;
+	timeout?: number;
+};
+
 const isArbitraryScriptsEnabled = (): boolean => {
 	return Deno.env.get('ENABLE_ARBITRARY_SCRIPTS') === 'true';
 };
@@ -27,15 +39,9 @@ export function getTools(dependencies: ToolDependencies): ToolConfig<any>[] {
 					description:
 						'Execute arbitrary AppleScript code. WARNING: This is a powerful and potentially dangerous tool. Only use with trusted code.',
 					category: 'AppleScript',
-					inputSchema: {
-						script: z.string().describe('The AppleScript code to execute'),
-						timeout: z
-							.number()
-							.optional()
-							.describe('Timeout in milliseconds (default: 30000, max: configured max)'),
-					},
+					inputSchema: runScriptInputSchema,
 				},
-				handler: async (args) => {
+				handler: (async (args: RunScriptArgs) => {
 					try {
 						logger.info('Executing arbitrary AppleScript');
 
@@ -78,7 +84,7 @@ export function getTools(dependencies: ToolDependencies): ToolConfig<any>[] {
 							isError: true,
 						};
 					}
-				},
+				}) as any,
 			},
 		];
 	} else {
@@ -91,12 +97,9 @@ export function getTools(dependencies: ToolDependencies): ToolConfig<any>[] {
 					description:
 						'Execute arbitrary AppleScript code. Currently DISABLED for safety. To enable, set ENABLE_ARBITRARY_SCRIPTS=true in the environment configuration.',
 					category: 'AppleScript',
-					inputSchema: {
-						script: z.string().describe('The AppleScript code to execute'),
-						timeout: z.number().optional().describe('Timeout in milliseconds'),
-					},
+					inputSchema: runScriptInputSchema,
 				},
-				handler: async (_args) => {
+				handler: (async (_args: RunScriptArgs) => {
 					const result = createErrorResult(
 						'disabled',
 						'The run_script tool is disabled for safety',
@@ -115,7 +118,7 @@ export function getTools(dependencies: ToolDependencies): ToolConfig<any>[] {
 						],
 						isError: true,
 					};
-				},
+				}) as any,
 			},
 		];
 	}
