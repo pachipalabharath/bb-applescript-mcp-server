@@ -97,8 +97,8 @@ import { assertEquals, assertThrows } from '@std/assert';
 import { functionToTest } from '../../src/path/to/module.ts';
 
 Deno.test('functionName - description of test case', () => {
-	const result = functionToTest(input);
-	assertEquals(result, expectedOutput);
+  const result = functionToTest(input);
+  assertEquals(result, expectedOutput);
 });
 ```
 
@@ -126,14 +126,14 @@ Deno.test('functionName - description of test case', () => {
    ```typescript
    const original = Deno.env.get('VAR');
    try {
-   	Deno.env.set('VAR', 'test');
-   	// ... test code ...
+     Deno.env.set('VAR', 'test');
+     // ... test code ...
    } finally {
-   	if (original) {
-   		Deno.env.set('VAR', original);
-   	} else {
-   		Deno.env.delete('VAR');
-   	}
+     if (original) {
+       Deno.env.set('VAR', original);
+     } else {
+       Deno.env.delete('VAR');
+     }
    }
    ```
 

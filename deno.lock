@@ -654,6 +654,7 @@
       "jsr:@beyondbetter/bb-mcp-server@~0.1.10",
       "jsr:@std/assert@1",
       "jsr:@std/path@1",
+      "npm:@modelcontextprotocol/sdk@1.18.2",
       "npm:zod@^3.22.4"
     ]
   }

@@ -18,24 +18,24 @@ import bbeditPlugin from './plugins/bbedit.plugin/plugin.ts';
  * @returns true if running from JSR (https://jsr.io/...), false if running locally (file://...)
  */
 export function isRunningFromJsr(): boolean {
-	const importUrl = import.meta.url;
+  const importUrl = import.meta.url;
 
-	// JSR modules are loaded via HTTPS URLs
-	if (
-		importUrl.startsWith('https://jsr.io/') ||
-		importUrl.startsWith('https://esm.sh/jsr/')
-	) {
-		return true;
-	}
+  // JSR modules are loaded via HTTPS URLs
+  if (
+    importUrl.startsWith('https://jsr.io/') ||
+    importUrl.startsWith('https://esm.sh/jsr/')
+  ) {
+    return true;
+  }
 
-	// Local development uses file:// URLs
-	if (importUrl.startsWith('file://')) {
-		return false;
-	}
+  // Local development uses file:// URLs
+  if (importUrl.startsWith('file://')) {
+    return false;
+  }
 
-	// Fallback: assume JSR if not a file URL
-	// This handles other CDN formats that might be used
-	return !importUrl.startsWith('file://');
+  // Fallback: assume JSR if not a file URL
+  // This handles other CDN formats that might be used
+  return !importUrl.startsWith('file://');
 }
 
 /**
@@ -47,10 +47,10 @@ export function isRunningFromJsr(): boolean {
  * @returns Array of statically imported plugins
  */
 export function getStaticPlugins(): AppPlugin[] {
-	return [
-		standardPlugin,
-		bbeditPlugin,
-	];
+  return [
+    standardPlugin,
+    bbeditPlugin,
+  ];
 }
 
 /**
@@ -71,41 +71,45 @@ export function getStaticPlugins(): AppPlugin[] {
  * @returns Partial dependencies with plugin configuration
  */
 export async function createAppleScriptDependencies(): Promise<Partial<AppServerDependencies>> {
-	const runningFromJsr = isRunningFromJsr();
+  const runningFromJsr = isRunningFromJsr();
 
-	if (runningFromJsr) {
-		// JSR mode: Static plugins for built-in tools
-		// User plugins can still be loaded from PLUGINS_DISCOVERY_PATHS
-		console.log('🌐 Running from JSR - built-in plugins loaded statically');
-		console.log('   User plugins can be added via PLUGINS_DISCOVERY_PATHS environment variable');
+  if (runningFromJsr) {
+    // JSR mode: Static plugins for built-in tools
+    // User plugins can still be loaded from PLUGINS_DISCOVERY_PATHS
+    console.log('🌐 Running from JSR - built-in plugins loaded statically');
+    console.log('   User plugins can be added via PLUGINS_DISCOVERY_PATHS environment variable');
 
-		return {
-			staticPlugins: getStaticPlugins(),
-			// Note: PluginManager will still discover user plugins from PLUGINS_DISCOVERY_PATHS
-			// if PLUGINS_AUTOLOAD=true (default). This allows users to extend the server
-			// with custom plugins even when running from JSR.
-		};
-	} else {
-		// Local mode: Static plugins as fallback + dynamic discovery
-		console.log('💻 Running locally - built-in plugins loaded statically + dynamic discovery enabled');
+    return {
+      staticPlugins: getStaticPlugins(),
+      // Note: PluginManager will still discover user plugins from PLUGINS_DISCOVERY_PATHS
+      // if PLUGINS_AUTOLOAD=true (default). This allows users to extend the server
+      // with custom plugins even when running from JSR.
+    };
+  } else {
+    // Local mode: Static plugins as fallback + dynamic discovery
+    console.log(
+      '💻 Running locally - built-in plugins loaded statically + dynamic discovery enabled',
+    );
 
-		return {
-			// Provide static plugins as fallback
-			// Dynamic discovery will add to these if enabled
-			staticPlugins: getStaticPlugins(),
-		};
-	}
+    return {
+      // Provide static plugins as fallback
+      // Dynamic discovery will add to these if enabled
+      staticPlugins: getStaticPlugins(),
+    };
+  }
 }
 
 /**
  * Log runtime information for debugging
  */
 export function logRuntimeInfo(): void {
-	const runningFromJsr = isRunningFromJsr();
-	const importUrl = import.meta.url;
+  const runningFromJsr = isRunningFromJsr();
+  const importUrl = import.meta.url;
 
-	console.log('📦 AppleScript MCP Server Runtime Info:');
-	console.log(`   Import URL: ${importUrl}`);
-	console.log(`   Running from JSR: ${runningFromJsr ? 'Yes' : 'No'}`);
-	console.log(`   Plugin loading: ${runningFromJsr ? 'Static only' : 'Dynamic discovery + Static'}`);
+  console.log('📦 AppleScript MCP Server Runtime Info:');
+  console.log(`   Import URL: ${importUrl}`);
+  console.log(`   Running from JSR: ${runningFromJsr ? 'Yes' : 'No'}`);
+  console.log(
+    `   Plugin loading: ${runningFromJsr ? 'Static only' : 'Dynamic discovery + Static'}`,
+  );
 }
