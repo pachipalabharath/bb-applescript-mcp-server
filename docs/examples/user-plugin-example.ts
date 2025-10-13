@@ -18,6 +18,8 @@ import type {
 	WorkflowRegistry,
 } from 'jsr:@beyondbetter/bb-mcp-server';
 import { z } from 'npm:zod@^3.22.4';
+import { runAppleScript } from '../../server/src/utils/scriptRunner.ts';
+import type { AppleScriptResult } from '../../server/src/utils/errorHandler.ts';
 
 /**
  * Example: Mail.app plugin
@@ -73,15 +75,14 @@ export default {
 						return "Email sent successfully"
 					`;
 
-					// Execute AppleScript
-					const command = new Deno.Command('osascript', {
-						args: ['-e', script],
+					// Execute AppleScript using runAppleScript utility
+					const result: AppleScriptResult = await runAppleScript({
+						script,
+						inline: true,
+						logger,
 					});
 
-					const { code, stdout, stderr } = await command.output();
-
-					if (code === 0) {
-						const result = new TextDecoder().decode(stdout).trim();
+					if (result.success) {
 						return {
 							content: [
 								{
@@ -92,7 +93,7 @@ export default {
 											message: 'Email sent successfully',
 											to: args.to,
 											subject: args.subject,
-											result,
+											result: result.output,
 										},
 										null,
 										2,
@@ -101,8 +102,8 @@ export default {
 							],
 						};
 					} else {
-						const error = new TextDecoder().decode(stderr).trim();
-						logger.error('Failed to send email', new Error(error));
+						const errorMsg = result.error?.message || 'Unknown error';
+						logger.error('Failed to send email', new Error(errorMsg));
 						return {
 							content: [
 								{
@@ -110,7 +111,8 @@ export default {
 									text: JSON.stringify(
 										{
 											success: false,
-											error: error,
+											error: errorMsg,
+											details: result.error?.details,
 										},
 										null,
 										2,
@@ -156,14 +158,14 @@ export default {
 						end tell
 					`;
 
-					const command = new Deno.Command('osascript', {
-						args: ['-e', script],
+					const result: AppleScriptResult = await runAppleScript({
+						script,
+						inline: true,
+						logger,
 					});
 
-					const { code, stdout } = await command.output();
-
-					if (code === 0) {
-						const count = parseInt(new TextDecoder().decode(stdout).trim());
+					if (result.success) {
+						const count = parseInt(result.output || '0');
 						return {
 							content: [
 								{
@@ -182,11 +184,20 @@ export default {
 							],
 						};
 					} else {
+						const errorMsg = result.error?.message || 'Failed to check mail';
 						return {
 							content: [
 								{
 									type: 'text',
-									text: JSON.stringify({ success: false, error: 'Failed to check mail' }, null, 2),
+									text: JSON.stringify(
+										{
+											success: false,
+											error: errorMsg,
+											details: result.error?.details,
+										},
+										null,
+										2,
+									),
 								},
 							],
 							isError: true,

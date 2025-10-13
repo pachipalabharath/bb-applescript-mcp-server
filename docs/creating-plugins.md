@@ -82,12 +82,7 @@ import {
 import { dirname, fromFileUrl } from '@std/path';
 import { z } from 'zod';
 import { findAndExecuteScript } from '../../utils/scriptLoader.ts';
-
-// Get the plugin directory path
-const getPluginDir = (): string => {
-    const currentFileUrl = import.meta.url;
-    return dirname(fromFileUrl(currentFileUrl));
-};
+import { getPluginDir } from '../../utils/pluginUtils.ts';
 
 export default {
     name: 'mail',
@@ -276,6 +271,7 @@ In `plugin.ts`:
 import { getTools as getSendEmailTools } from './tools/sendEmail.ts';
 import { getTools as getReadEmailTools } from './tools/readEmail.ts';
 import { getTools as getSearchEmailTools } from './tools/searchEmail.ts';
+import { getPluginDir } from '../../utils/pluginUtils.ts';
 
 export default {
     name: 'mail',
@@ -308,13 +304,7 @@ See `src/plugins/standard.plugin/plugin.ts` for a real example.
 For tools that work with file paths, expand `~` to home directory:
 
 ```typescript
-const expandHomePath = (path: string): string => {
-    if (path.startsWith('~/')) {
-        const home = Deno.env.get('HOME') || Deno.env.get('USERPROFILE') || '';
-        return path.replace(/^~/, home);
-    }
-    return path;
-};
+import { expandHomePath } from '../../utils/pluginUtils.ts';
 
 // Use in tool handler:
 const filePath = expandHomePath(args.path);
@@ -532,8 +522,7 @@ import {
 import { dirname, fromFileUrl } from '@std/path';
 import { z } from 'zod';
 import { findAndExecuteScript } from '../../utils/scriptLoader.ts';
-
-const getPluginDir = () => dirname(fromFileUrl(import.meta.url));
+import { getPluginDir } from '../../utils/pluginUtils.ts';
 
 export default {
     name: 'safari',
