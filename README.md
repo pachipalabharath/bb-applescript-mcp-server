@@ -1,5 +1,14 @@
 # AppleScript MCP Server
 
+[![Beyond Better](https://img.shields.io/badge/Beyond-Better-blue?style=flat&labelColor=6FD99C&color=0C1F3E)](https://beyondbetter.app)
+![MCP Server](https://img.shields.io/badge/MCP-Server-blue?style=flat&logo=modelcontextprotocol&logoSize=auto&logoColor=black&labelColor=beige)
+[![MCP Server](https://img.shields.io/badge/MCP-Beyond%20Better-blue?style=flat&logo=modelcontextprotocol&logoSize=auto&logoColor=black&labelColor=beige)](https://github.com/Beyond-Better/bb-mcp-server)
+
+[![JSR](https://jsr.io/badges/@beyondbetter/bb-applescript-mcp-server)](https://jsr.io/@beyondbetter/bb-applescript-mcp-server)
+[![JSR Score](https://jsr.io/badges/@beyondbetter/bb-applescript-mcp-server/score)](https://jsr.io/@beyondbetter/bb-applescript-mcp-server)
+[![JSR Scope](https://jsr.io/badges/@beyondbetter)](https://jsr.io/@beyondbetter)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 A Model Context Protocol (MCP) server that enables LLM clients to interact with macOS applications through AppleScript. Built using the [@beyondbetter/bb-mcp-server](https://github.com/Beyond-Better/bb-mcp-server) library, this server provides safe, controlled execution of predefined scripts with optional support for arbitrary script execution.
 
 ## Features
